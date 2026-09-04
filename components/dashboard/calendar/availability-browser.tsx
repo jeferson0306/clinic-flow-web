@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CalendarDays } from "lucide-react";
-import { Select } from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
+import { useAvailability } from "@/lib/hooks/use-availability";
 import { useTranslation } from "@/lib/i18n";
-import type { Doctor, Procedure, TimeSlot } from "@/lib/types";
+import type { Doctor, Procedure } from "@/lib/types";
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
@@ -18,38 +19,10 @@ export function AvailabilityBrowser({ doctors, procedures }: { doctors: Doctor[]
   const [doctorId, setDoctorId] = useState(doctors[0]?.id ?? "");
   const [procedureId, setProcedureId] = useState(procedures[0]?.id ?? "");
   const [date, setDate] = useState(todayIso());
-  const [slots, setSlots] = useState<TimeSlot[]>([]);
-  const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
 
-  const canFetchSlots = Boolean(doctorId) && Boolean(procedureId) && Boolean(date);
-
-  useEffect(() => {
-    // See ScheduleDialog's identical comment: an incomplete selection
-    // renders `[]` directly below rather than being mirrored into state.
-    if (!canFetchSlots) return;
-
-    let cancelled = false;
-    // Same as ScheduleDialog: this kicks off the fetch started right below.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLoading(true);
-    fetch(`/api/availability?doctorId=${doctorId}&procedureId=${procedureId}&date=${date}`)
-      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then((data: { freeSlots: TimeSlot[] }) => {
-        if (!cancelled) setSlots(data.freeSlots);
-      })
-      .catch(() => {
-        if (!cancelled) setSlots([]);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [canFetchSlots, doctorId, procedureId, date]);
-
-  const visibleSlots = canFetchSlots ? slots : [];
+  const { data, isFetching } = useAvailability(doctorId, procedureId, date);
+  const slots = data?.freeSlots ?? [];
 
   if (doctors.length === 0 || procedures.length === 0) {
     return (
@@ -62,24 +35,26 @@ export function AvailabilityBrowser({ doctors, procedures }: { doctors: Doctor[]
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <Select label={t("calendar.select_doctor")} value={doctorId} onChange={(e) => setDoctorId(e.target.value)}>
-          {doctors.map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.fullName} — {d.specialty}
-            </option>
-          ))}
-        </Select>
-        <Select
+        <Combobox
+          label={t("calendar.select_doctor")}
+          value={doctorId}
+          onChange={setDoctorId}
+          placeholder={`${t("common.search")}...`}
+          emptyLabel={t("common.empty")}
+          options={doctors.map((d) => ({ value: d.id, label: d.fullName, hint: d.specialty }))}
+        />
+        <Combobox
           label={t("calendar.select_procedure")}
           value={procedureId}
-          onChange={(e) => setProcedureId(e.target.value)}
-        >
-          {procedures.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name} ({p.durationMinutes} min)
-            </option>
-          ))}
-        </Select>
+          onChange={setProcedureId}
+          placeholder={`${t("common.search")}...`}
+          emptyLabel={t("common.empty")}
+          options={procedures.map((p) => ({
+            value: p.id,
+            label: p.name,
+            hint: `${p.durationMinutes} min`,
+          }))}
+        />
         <div className="flex flex-col gap-1.5">
           <label htmlFor="cal-date" className="text-xs font-semibold text-[var(--text-secondary)]">
             {t("appointments.date")}
@@ -96,13 +71,13 @@ export function AvailabilityBrowser({ doctors, procedures }: { doctors: Doctor[]
       </div>
 
       <div className="rounded-[10px] border border-[var(--border)] bg-[var(--bg-surface)] p-4 min-h-[120px]">
-        {loading ? (
+        {isFetching ? (
           <p className="text-sm text-[var(--text-muted)]">{t("common.loading")}</p>
-        ) : visibleSlots.length === 0 ? (
+        ) : slots.length === 0 ? (
           <p className="text-sm text-[var(--text-muted)]">{t("appointments.no_slots")}</p>
         ) : (
           <div className="flex flex-wrap gap-2">
-            {visibleSlots.map((slot) => (
+            {slots.map((slot) => (
               <span
                 key={slot.startsAt}
                 className="flex items-center gap-1.5 rounded-md border border-[var(--border)] px-2.5 py-1.5 text-xs text-[var(--text-secondary)]"

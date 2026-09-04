@@ -11,6 +11,14 @@ see [Architecture](#architecture) for why.
 - **Next.js 16** (App Router, Turbopack) + **React 19** + **TypeScript** (strict)
 - **Tailwind v4** — dark/light theme via CSS variables, no flash on load
 - **Radix UI** primitives (dialog, tabs, tooltip) + **lucide-react** icons
+- **TanStack Table** for every resource list — client-side sorting and a
+  global search box, GSAP-staggered row entrance (`components/dashboard/data-table.tsx`)
+- **cmdk**, custom-wired (not Radix Popover — see the comment in
+  `components/ui/combobox.tsx` for why) for the patient/doctor/procedure
+  autocomplete pickers used in the appointment/exam dialogs
+- **TanStack Query** for the one piece of genuinely live client-side data —
+  a doctor's free slots, re-fetched as the appointment scheduler's selection
+  changes (`lib/hooks/use-availability.ts`) — everything else is server-rendered
 - **GSAP** for entrance animations and a count-up on the dashboard's stat cards
 - **react-hook-form** is available but most forms here use React 19's native
   `<form action={...}>` — a Server Action IS the submit handler, so there is no
@@ -61,6 +69,15 @@ The real boundary is the backend's own `@RolesAllowed`: every Server Action stil
 back, and the UI surfaces it as a toast rather than crashing (try requesting an exam
 while signed in as `admin` — that endpoint is `@RolesAllowed("DOCTOR")`).
 
+**A Server Component page can pass data to a Client Component, never functions.**
+Every resource page fetches data as a Server Component, but a TanStack Table
+`ColumnDef`'s `cell`/`accessorFn` *are* functions — passing a `columns` array built
+in the page straight into `<DataTable>` throws at runtime ("functions cannot be
+passed directly to Client Components"). The fix used throughout `dashboard/<resource>/`:
+the page passes only plain, serializable arrays down; a `<Resource>Table` client
+component (e.g. `patients-table.tsx`) builds the `ColumnDef[]` itself, using its own
+`useTranslation()` for labels rather than a `t` function passed down as a prop.
+
 ## Running locally
 
 You need the [clinic-flow](https://github.com/jeferson0306/clinic-flow) backend running
@@ -93,7 +110,9 @@ Unit tests cover the Brazilian data validators/formatters (`validations/br.ts`) 
 `lib/utils.ts`'s formatters — deliberately network-free so they run in CI without a
 backend. `e2e/` is a real integration suite against a live backend (login, RBAC-gated
 error handling, a full patient-registration flow with a freshly generated check-digit-valid
-CPF so reruns don't collide with the unique constraint) — it is not wired into CI for
+CPF so reruns don't collide with the unique constraint, and a regression test for a real
+focus bug where the autocomplete's search input didn't receive keyboard focus inside a
+Dialog — see the comment in `components/ui/combobox.tsx`) — it is not wired into CI for
 that reason; run it locally, or point CI at a backend if you stand one up there.
 
 ## Project structure
@@ -102,19 +121,25 @@ that reason; run it locally, or point CI at a backend if you stand one up there.
 app/
   (auth)/login/          public route
   (dashboard)/dashboard/  gated by proxy.ts — patients, doctors, procedures,
-                          appointments, calendar, exams, each a Server Component
-                          page + a client dialog for the "create" form
+                          appointments, calendar, exams. Each resource is a Server
+                          Component page (fetches data) + a client <Resource>Table
+                          component (owns the TanStack Table columns — see the note
+                          in patients-table.tsx on why that split exists) + a client
+                          dialog for the "create" form
   actions/                Server Actions — the only place that mutates backend state
   api/availability/       the one Route Handler (see Architecture)
 components/
-  ui/                     Button, Input, Select, Dialog — small, reused everywhere
+  ui/                     Button, Input, Dialog, Combobox — small, reused everywhere
   layout/                 Sidebar (collapsible, persisted), Topbar (theme/locale/logout)
-  dashboard/<resource>/    resource-specific dialogs and widgets
+  dashboard/data-table.tsx  generic TanStack Table wrapper: sorting, a global search
+                            box, GSAP row-entrance animation
+  dashboard/<resource>/    resource-specific tables, dialogs and widgets
 lib/
   api.ts                  server-only typed fetch client (the ApiError class lives here)
   session.ts              httpOnly cookie helpers
   i18n.tsx / i18n-server.ts  client dictionary + server-side mirror (cookie-synced)
   types.ts                TypeScript types mirroring the backend's DTOs exactly
+  hooks/use-availability.ts  the one TanStack Query hook — see Stack
 validations/br.ts          CPF/CNPJ/phone/CEP — client-side UX only; the backend's own
                             brdoc call is still the source of truth on every write
 e2e/                        Playwright specs

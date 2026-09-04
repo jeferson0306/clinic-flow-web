@@ -6,10 +6,11 @@ import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { scheduleAppointment } from "@/app/actions/appointments";
 import { Button } from "@/components/ui/button";
-import { Select } from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { Dialog } from "@/components/ui/dialog";
+import { useAvailability } from "@/lib/hooks/use-availability";
 import { useTranslation } from "@/lib/i18n";
-import type { Doctor, Patient, Procedure, TimeSlot } from "@/lib/types";
+import type { Doctor, Patient, Procedure } from "@/lib/types";
 
 function formatTime(iso: string): string {
   return new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
@@ -43,44 +44,21 @@ export function ScheduleDialog({
   const [doctorId, setDoctorId] = useState("");
   const [procedureId, setProcedureId] = useState("");
   const [date, setDate] = useState(todayIso());
-  const [slots, setSlots] = useState<TimeSlot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState("");
-  const [loadingSlots, setLoadingSlots] = useState(false);
   const { t } = useTranslation();
 
-  const canFetchSlots = open && Boolean(doctorId) && Boolean(procedureId) && Boolean(date);
+  const { data, isFetching } = useAvailability(doctorId, procedureId, date, open);
+  const slots = data?.freeSlots ?? [];
 
   useEffect(() => {
-    // Deliberately not calling setSlots([]) here: when a selection is
-    // incomplete, `slots` for rendering is derived below as `[]` directly
-    // rather than mirrored into state — one fewer render, and nothing to
-    // keep in sync with this effect's own dependencies.
-    if (!canFetchSlots) return;
-
-    let cancelled = false;
-    // Kicking off the loading flag for the request this effect starts right
-    // below — not mirroring a prop/state value, which is what this rule
-    // otherwise guards against.
+    // "Adjusting state when a prop changes" — one of the effect uses React's
+    // own docs call out as legitimate, not the anti-pattern this rule
+    // otherwise targets: the previously selected slot almost never survives
+    // a change to any of the inputs that determine which slots exist, and
+    // submitting a startsAt no longer in the visible list would be wrong.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLoadingSlots(true);
     setSelectedSlot("");
-    fetch(`/api/availability?doctorId=${doctorId}&procedureId=${procedureId}&date=${date}`)
-      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then((data: { freeSlots: TimeSlot[] }) => {
-        if (!cancelled) setSlots(data.freeSlots);
-      })
-      .catch(() => {
-        if (!cancelled) setSlots([]);
-      })
-      .finally(() => {
-        if (!cancelled) setLoadingSlots(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [canFetchSlots, doctorId, procedureId, date]);
-
-  const visibleSlots = canFetchSlots ? slots : [];
+  }, [doctorId, procedureId, date]);
 
   return (
     <Dialog
@@ -116,56 +94,42 @@ export function ScheduleDialog({
         }}
         className="flex flex-col gap-3"
       >
-        <Select
+        <Combobox
           label={t("appointments.patient")}
           name="patientId"
           required
           value={patientId}
-          onChange={(e) => setPatientId(e.target.value)}
-        >
-          <option value="" disabled>
-            {t("common.search")}...
-          </option>
-          {patients.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.fullName}
-            </option>
-          ))}
-        </Select>
+          onChange={setPatientId}
+          placeholder={`${t("common.search")}...`}
+          emptyLabel={t("common.empty")}
+          options={patients.map((p) => ({ value: p.id, label: p.fullName, hint: p.email }))}
+        />
 
-        <Select
+        <Combobox
           label={t("appointments.doctor")}
           name="doctorId"
           required
           value={doctorId}
-          onChange={(e) => setDoctorId(e.target.value)}
-        >
-          <option value="" disabled>
-            {t("common.search")}...
-          </option>
-          {doctors.map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.fullName} — {d.specialty}
-            </option>
-          ))}
-        </Select>
+          onChange={setDoctorId}
+          placeholder={`${t("common.search")}...`}
+          emptyLabel={t("common.empty")}
+          options={doctors.map((d) => ({ value: d.id, label: d.fullName, hint: d.specialty }))}
+        />
 
-        <Select
+        <Combobox
           label={t("appointments.procedure")}
           name="procedureId"
           required
           value={procedureId}
-          onChange={(e) => setProcedureId(e.target.value)}
-        >
-          <option value="" disabled>
-            {t("common.search")}...
-          </option>
-          {procedures.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name} ({p.durationMinutes} min)
-            </option>
-          ))}
-        </Select>
+          onChange={setProcedureId}
+          placeholder={`${t("common.search")}...`}
+          emptyLabel={t("common.empty")}
+          options={procedures.map((p) => ({
+            value: p.id,
+            label: p.name,
+            hint: `${p.durationMinutes} min`,
+          }))}
+        />
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="appt-date" className="text-xs font-semibold text-[var(--text-secondary)]">
@@ -185,13 +149,13 @@ export function ScheduleDialog({
           <span className="text-xs font-semibold text-[var(--text-secondary)]">{t("appointments.slot")}</span>
           {!doctorId || !procedureId ? (
             <p className="text-xs text-[var(--text-muted)]">{t("appointments.pick_doctor_first")}</p>
-          ) : loadingSlots ? (
+          ) : isFetching ? (
             <p className="text-xs text-[var(--text-muted)]">{t("common.loading")}</p>
-          ) : visibleSlots.length === 0 ? (
+          ) : slots.length === 0 ? (
             <p className="text-xs text-[var(--text-muted)]">{t("appointments.no_slots")}</p>
           ) : (
             <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto">
-              {visibleSlots.map((slot) => (
+              {slots.map((slot) => (
                 <button
                   key={slot.startsAt}
                   type="button"

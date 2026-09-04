@@ -1,7 +1,6 @@
 import { api } from "@/lib/api";
 import { getDictionary } from "@/lib/i18n-server";
-import { formatCurrency } from "@/lib/utils";
-import { DataTable, type Column } from "@/components/dashboard/data-table";
+import { ProceduresTable } from "@/components/dashboard/procedures/procedures-table";
 import { NewProcedureDialog } from "@/components/dashboard/procedures/new-procedure-dialog";
 import type { Procedure } from "@/lib/types";
 
@@ -10,12 +9,6 @@ export default async function ProceduresPage() {
     getDictionary(),
     api.procedures.list().catch(() => [] as Procedure[]),
   ]);
-
-  const columns: Column<Procedure>[] = [
-    { header: t("procedures.name"), cell: (p) => p.name },
-    { header: t("procedures.duration"), cell: (p) => `${p.durationMinutes} min` },
-    { header: t("procedures.price"), cell: (p) => formatCurrency(p.priceCents / 100) },
-  ];
 
   return (
     <main className="p-6">
@@ -27,7 +20,7 @@ export default async function ProceduresPage() {
         <NewProcedureDialog />
       </div>
 
-      <DataTable columns={columns} rows={procedures} emptyLabel={t("common.empty")} />
+      <ProceduresTable procedures={procedures} />
     </main>
   );
 }
