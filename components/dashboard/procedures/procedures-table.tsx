@@ -1,6 +1,9 @@
 "use client";
 
 import { DataTable, type ColumnDef } from "@/components/dashboard/data-table";
+import { DeleteButton } from "@/components/dashboard/delete-button";
+import { EditProcedureDialog } from "@/components/dashboard/procedures/edit-procedure-dialog";
+import { deleteProcedure } from "@/app/actions/procedures";
 import { useTranslation } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/utils";
 import type { Procedure } from "@/lib/types";
@@ -21,6 +24,17 @@ export function ProceduresTable({ procedures }: { procedures: Procedure[] }) {
       header: t("procedures.price"),
       accessorFn: (p) => p.priceCents,
       cell: (info) => formatCurrency(info.getValue<number>() / 100),
+    },
+    {
+      id: "actions",
+      header: t("common.actions"),
+      enableSorting: false,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-1">
+          <EditProcedureDialog procedure={row.original} />
+          <DeleteButton id={row.original.id} deleteAction={deleteProcedure} />
+        </div>
+      ),
     },
   ];
 

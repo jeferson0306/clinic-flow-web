@@ -30,3 +30,43 @@ export async function createDoctor(_prev: FormState, formData: FormData): Promis
   revalidatePath("/dashboard/doctors");
   return { error: null };
 }
+
+export async function updateDoctor(_prev: FormState, formData: FormData): Promise<FormState> {
+  const id = String(formData.get("id") ?? "");
+  const fullName = String(formData.get("fullName") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim();
+  const specialty = String(formData.get("specialty") ?? "").trim();
+  const licenseNumber = String(formData.get("licenseNumber") ?? "").trim();
+
+  if (!id || !fullName || !email || !specialty || !licenseNumber) {
+    return { error: "missing_fields" };
+  }
+
+  try {
+    await api.doctors.update(id, { fullName, email, specialty, licenseNumber });
+  } catch (error) {
+    if (error instanceof ApiError && error.body) {
+      return {
+        error: error.body.category,
+        fieldErrors: error.body.field ? { [error.body.field]: error.body.message } : undefined,
+      };
+    }
+    return { error: "unknown" };
+  }
+
+  revalidatePath("/dashboard/doctors");
+  return { error: null };
+}
+
+export async function deleteDoctor(id: string): Promise<{ error: string | null }> {
+  try {
+    await api.doctors.delete(id);
+  } catch (error) {
+    if (error instanceof ApiError && error.body) {
+      return { error: error.body.category };
+    }
+    return { error: "unknown" };
+  }
+  revalidatePath("/dashboard/doctors");
+  return { error: null };
+}

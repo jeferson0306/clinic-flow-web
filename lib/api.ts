@@ -97,6 +97,11 @@ export const api = {
       birthDate?: string;
       postcode: string;
     }) => request<Patient>("/v1/patients", { method: "POST", body: data }),
+    update: (
+      id: string,
+      data: { fullName: string; email: string; phone?: string; birthDate?: string; postcode: string },
+    ) => request<Patient>(`/v1/patients/${id}`, { method: "PUT", body: data }),
+    delete: (id: string) => request<void>(`/v1/patients/${id}`, { method: "DELETE" }),
   },
 
   doctors: {
@@ -109,6 +114,11 @@ export const api = {
       specialty: string;
       licenseNumber: string;
     }) => request<Doctor>("/v1/doctors", { method: "POST", body: data }),
+    update: (
+      id: string,
+      data: { fullName: string; email: string; specialty: string; licenseNumber: string },
+    ) => request<Doctor>(`/v1/doctors/${id}`, { method: "PUT", body: data }),
+    delete: (id: string) => request<void>(`/v1/doctors/${id}`, { method: "DELETE" }),
     availability: (id: string, procedureId: string, date: string) =>
       request<Availability>(
         `/v1/doctors/${id}/availability?procedureId=${procedureId}&date=${date}`,
@@ -120,6 +130,9 @@ export const api = {
     get: (id: string) => request<Procedure>(`/v1/procedures/${id}`),
     create: (data: { name: string; durationMinutes: number; priceCents: number }) =>
       request<Procedure>("/v1/procedures", { method: "POST", body: data }),
+    update: (id: string, data: { name: string; durationMinutes: number; priceCents: number }) =>
+      request<Procedure>(`/v1/procedures/${id}`, { method: "PUT", body: data }),
+    delete: (id: string) => request<void>(`/v1/procedures/${id}`, { method: "DELETE" }),
   },
 
   exams: {

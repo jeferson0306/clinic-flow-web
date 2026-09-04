@@ -43,7 +43,15 @@
     "actions": "Ações",
     "created_at": "Criado em",
     "collapse": "Recolher",
-    "expand": "Expandir"
+    "expand": "Expandir",
+    "delete_confirm": "Tem a certeza que quer excluir?",
+    "delete_success": "Excluído com sucesso.",
+    "update_success": "Atualizado com sucesso.",
+    "in_use_error": "Este registo tem consultas ou exames associados e não pode ser excluído.",
+    "previous": "Anterior",
+    "next": "Seguinte",
+    "page_info": "Página {page} de {total}",
+    "rows_per_page": "Linhas por página"
   },
   "patients": {
     "title": "Pacientes",
@@ -60,7 +68,8 @@
     "create_success": "Paciente registado com sucesso.",
     "duplicate_cpf": "Já existe um paciente com este CPF.",
     "phone_optional": "Opcional",
-    "birth_date_optional": "Opcional"
+    "birth_date_optional": "Opcional",
+    "edit": "Editar paciente"
   },
   "doctors": {
     "title": "Médicos",
@@ -72,7 +81,8 @@
     "specialty": "Especialidade",
     "license_number": "CRM",
     "create_success": "Médico registado com sucesso.",
-    "duplicate": "Já existe um médico com este CPF ou CRM."
+    "duplicate": "Já existe um médico com este CPF ou CRM.",
+    "edit": "Editar médico"
   },
   "procedures": {
     "title": "Procedimentos",
@@ -81,7 +91,8 @@
     "name": "Nome",
     "duration": "Duração (min)",
     "price": "Preço",
-    "create_success": "Procedimento adicionado ao catálogo."
+    "create_success": "Procedimento adicionado ao catálogo.",
+    "edit": "Editar procedimento"
   },
   "appointments": {
     "title": "Consultas",

@@ -14,6 +14,7 @@ import {
   Plus,
   Stethoscope,
   Users,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n";
@@ -30,11 +31,28 @@ const NAV_ITEMS = [
 
 const COLLAPSE_KEY = "sidebar-collapsed";
 
-export function Sidebar() {
+export function Sidebar({
+  mobileOpen,
+  onCloseMobile,
+}: {
+  mobileOpen: boolean;
+  onCloseMobile: () => void;
+}) {
   const pathname = usePathname();
   const { t } = useTranslation();
   const [collapsed, setCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
+  // The desktop collapsed width never applies to the mobile drawer — it is
+  // always full-width there, so its labels should never hide just because a
+  // previous desktop session left "collapsed" in localStorage.
+  const showLabels = mobileOpen || !collapsed || !mounted;
+
+  // A route change is the moment the drawer should close on mobile — the
+  // user navigated, there is nothing left for it to cover.
+  useEffect(() => {
+    onCloseMobile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   useEffect(() => {
     // localStorage does not exist during SSR, so the saved preference can
@@ -60,23 +78,47 @@ export function Sidebar() {
   }
 
   return (
-    <aside
-      className={cn(
-        "flex flex-col h-full shrink-0 overflow-hidden transition-[width] duration-200 ease-out",
-        mounted ? (collapsed ? "w-[64px]" : "w-[220px]") : "w-[220px]",
+    <>
+      {/* Backdrop: mobile only, and only while the drawer is open. Desktop
+          never renders it — the sidebar there is permanent flex layout, not
+          an overlay. */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={onCloseMobile}
+          aria-hidden="true"
+        />
       )}
-      style={{ borderRight: "1px solid var(--border)", background: "var(--bg-body)" }}
-    >
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--border)] min-h-[52px]">
-        <div className="w-6 h-6 rounded-md bg-[var(--accent)] flex items-center justify-center shrink-0">
-          <Plus size={13} className="text-white" strokeWidth={3} />
-        </div>
-        {(!collapsed || !mounted) && (
-          <span className="text-sm font-bold text-[var(--text-primary)] whitespace-nowrap">
-            {t("app.name")}
-          </span>
+
+      <aside
+        className={cn(
+          "flex flex-col h-full shrink-0 overflow-hidden transition-[width] duration-200 ease-out",
+          mounted ? (collapsed ? "md:w-[64px]" : "md:w-[220px]") : "md:w-[220px]",
+          // Mobile: fixed off-canvas panel that slides in/out; desktop:
+          // back to normal in-flow flex sizing above, translate reset to 0.
+          "fixed inset-y-0 left-0 z-50 w-[240px] -translate-x-full md:static md:translate-x-0",
+          mobileOpen && "translate-x-0",
         )}
-      </div>
+        style={{ borderRight: "1px solid var(--border)", background: "var(--bg-body)" }}
+      >
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--border)] min-h-[52px]">
+          <div className="w-6 h-6 rounded-md bg-[var(--accent)] flex items-center justify-center shrink-0">
+            <Plus size={13} className="text-white" strokeWidth={3} />
+          </div>
+          {showLabels && (
+            <span className="text-sm font-bold text-[var(--text-primary)] whitespace-nowrap flex-1">
+              {t("app.name")}
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={onCloseMobile}
+            aria-label={t("common.close")}
+            className="md:hidden text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+          >
+            <X size={16} />
+          </button>
+        </div>
 
       <nav className="flex-1 py-2 overflow-y-auto">
         {NAV_ITEMS.map(({ key, href, icon: Icon }) => {
@@ -94,7 +136,7 @@ export function Sidebar() {
               )}
             >
               <Icon size={15} className="shrink-0" />
-              {(!collapsed || !mounted) && <span className="whitespace-nowrap">{t(key)}</span>}
+              {showLabels && <span className="whitespace-nowrap">{t(key)}</span>}
             </Link>
           );
         })}
@@ -104,11 +146,12 @@ export function Sidebar() {
         type="button"
         onClick={toggle}
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        className="flex items-center gap-2 px-4 py-3 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] border-t border-[var(--border)] transition-colors"
+        className="hidden md:flex items-center gap-2 px-4 py-3 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] border-t border-[var(--border)] transition-colors"
       >
         {collapsed ? <ChevronsRight size={15} /> : <ChevronsLeft size={15} />}
         {(!collapsed || !mounted) && <span>{t("common.collapse")}</span>}
       </button>
-    </aside>
+      </aside>
+    </>
   );
 }

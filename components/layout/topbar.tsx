@@ -1,20 +1,36 @@
 "use client";
 
 import { useState } from "react";
-import { LogOut, Moon, Sun } from "lucide-react";
+import { LogOut, Menu, Moon, Sun } from "lucide-react";
 import { logout } from "@/app/actions/auth";
 import { useTheme } from "@/lib/theme";
 import { LOCALE_LABELS, useTranslation, type Locale } from "@/lib/i18n";
 import type { Role } from "@/lib/types";
 
-export function Topbar({ username, role }: { username: string; role: Role }) {
+export function Topbar({
+  username,
+  role,
+  onOpenMobileNav,
+}: {
+  username: string;
+  role: Role;
+  onOpenMobileNav: () => void;
+}) {
   const { theme, toggle } = useTheme();
   const { locale, setLocale, t } = useTranslation();
   const [localeOpen, setLocaleOpen] = useState(false);
 
   return (
     <header className="flex items-center justify-between gap-3 px-4 sm:px-6 py-3 border-b border-[var(--border)] bg-[var(--bg-body)]">
-      <div className="min-w-0">
+      <div className="flex items-center gap-2 min-w-0">
+        <button
+          type="button"
+          onClick={onOpenMobileNav}
+          aria-label="Open navigation"
+          className="md:hidden flex items-center justify-center h-8 w-8 -ml-1.5 shrink-0 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] transition-colors"
+        >
+          <Menu size={17} />
+        </button>
         <p className="text-xs text-[var(--text-muted)] truncate">
           {t("auth.signed_in_as")} <span className="font-medium text-[var(--text-secondary)]">{username}</span>{" "}
           &middot; {role}

@@ -1,6 +1,9 @@
 "use client";
 
 import { DataTable, type ColumnDef } from "@/components/dashboard/data-table";
+import { DeleteButton } from "@/components/dashboard/delete-button";
+import { EditPatientDialog } from "@/components/dashboard/patients/edit-patient-dialog";
+import { deletePatient } from "@/app/actions/patients";
 import { useTranslation } from "@/lib/i18n";
 import type { Patient } from "@/lib/types";
 
@@ -23,6 +26,17 @@ export function PatientsTable({ patients }: { patients: Patient[] }) {
       id: "address",
       header: t("patients.address"),
       accessorFn: (p) => (p.address.city ? `${p.address.city} — ${p.address.state}` : p.address.postcode),
+    },
+    {
+      id: "actions",
+      header: t("common.actions"),
+      enableSorting: false,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-1">
+          <EditPatientDialog patient={row.original} />
+          <DeleteButton id={row.original.id} deleteAction={deletePatient} />
+        </div>
+      ),
     },
   ];
 

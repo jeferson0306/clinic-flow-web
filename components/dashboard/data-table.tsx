@@ -3,17 +3,22 @@
 import { useEffect, useRef, useState } from "react";
 import {
   type ColumnDef,
+  type PaginationState,
   type SortingState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
+  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowDown, ArrowUp, ArrowUpDown, Search } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpDown, Search } from "lucide-react";
 import { gsap } from "gsap";
+import { useTranslation } from "@/lib/i18n";
 
 export type { ColumnDef } from "@tanstack/react-table";
+
+const PAGE_SIZE_OPTIONS = [10, 25, 50];
 
 export function DataTable<T extends { id: string }>({
   columns,
@@ -28,17 +33,21 @@ export function DataTable<T extends { id: string }>({
 }) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: PAGE_SIZE_OPTIONS[0] });
   const bodyRef = useRef<HTMLTableSectionElement>(null);
+  const { t } = useTranslation();
 
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, globalFilter },
+    state: { sorting, globalFilter, pagination },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     // Callers rarely need custom cell rendering — most columns are just an
     // accessorFn returning a display string — so render that string by
     // default and let a column override `cell` only when it needs JSX.
@@ -46,6 +55,7 @@ export function DataTable<T extends { id: string }>({
   });
 
   const rows = table.getRowModel().rows;
+  const pageCount = table.getPageCount();
 
   useEffect(() => {
     const rowEls = bodyRef.current?.querySelectorAll("tr");
@@ -60,9 +70,9 @@ export function DataTable<T extends { id: string }>({
     return () => {
       tween.kill();
     };
-    // Re-run whenever the visible row count/order changes (sort, filter, or
-    // fresh data from the server) — not on every render.
-  }, [rows.length, globalFilter, sorting]);
+    // Re-run whenever the visible row count/order/page changes — not on
+    // every render.
+  }, [rows.length, globalFilter, sorting, pagination.pageIndex]);
 
   if (data.length === 0) {
     return (
@@ -141,6 +151,53 @@ export function DataTable<T extends { id: string }>({
           </tbody>
         </table>
       </div>
+
+      {data.length > PAGE_SIZE_OPTIONS[0] && (
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--text-secondary)]">
+          <div className="flex items-center gap-2">
+            <span>{t("common.rows_per_page")}</span>
+            <select
+              value={pagination.pageSize}
+              onChange={(e) => table.setPageSize(Number(e.target.value))}
+              className="h-7 rounded-md border border-[var(--border)] bg-[var(--bg-hover)] px-2 text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent)]"
+            >
+              {PAGE_SIZE_OPTIONS.map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span>
+              {t("common.page_info")
+                .replace("{page}", String(pagination.pageIndex + 1))
+                .replace("{total}", String(Math.max(pageCount, 1)))}
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+                className="inline-flex items-center justify-center h-7 w-7 rounded-md border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                aria-label={t("common.previous")}
+              >
+                <ArrowLeft size={12} />
+              </button>
+              <button
+                type="button"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+                className="inline-flex items-center justify-center h-7 w-7 rounded-md border border-[var(--border)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] disabled:opacity-40 disabled:pointer-events-none transition-colors"
+                aria-label={t("common.next")}
+              >
+                <ArrowRight size={12} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

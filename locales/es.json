@@ -43,7 +43,15 @@
     "actions": "Acciones",
     "created_at": "Creado el",
     "collapse": "Contraer",
-    "expand": "Expandir"
+    "expand": "Expandir",
+    "delete_confirm": "¿Seguro que quieres eliminar esto?",
+    "delete_success": "Eliminado con éxito.",
+    "update_success": "Actualizado con éxito.",
+    "in_use_error": "Este registro tiene consultas o exámenes asociados y no se puede eliminar.",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "page_info": "Página {page} de {total}",
+    "rows_per_page": "Filas por página"
   },
   "patients": {
     "title": "Pacientes",
@@ -60,7 +68,8 @@
     "create_success": "Paciente registrado con éxito.",
     "duplicate_cpf": "Ya existe un paciente con este CPF.",
     "phone_optional": "Opcional",
-    "birth_date_optional": "Opcional"
+    "birth_date_optional": "Opcional",
+    "edit": "Editar paciente"
   },
   "doctors": {
     "title": "Médicos",
@@ -72,7 +81,8 @@
     "specialty": "Especialidad",
     "license_number": "Número de colegiado",
     "create_success": "Médico registrado con éxito.",
-    "duplicate": "Ya existe un médico con este CPF o número de colegiado."
+    "duplicate": "Ya existe un médico con este CPF o número de colegiado.",
+    "edit": "Editar médico"
   },
   "procedures": {
     "title": "Procedimientos",
@@ -81,7 +91,8 @@
     "name": "Nombre",
     "duration": "Duración (min)",
     "price": "Precio",
-    "create_success": "Procedimiento añadido al catálogo."
+    "create_success": "Procedimiento añadido al catálogo.",
+    "edit": "Editar procedimiento"
   },
   "appointments": {
     "title": "Consultas",
