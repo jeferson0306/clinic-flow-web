@@ -2,19 +2,11 @@ import { test, expect } from "@playwright/test";
 
 /** Same live-backend requirement as e2e/auth.spec.ts. */
 
-// Row/button accessible names below are matched against a dynamically-built
-// RegExp — escaped since a generated name can end up containing characters
-// (parens, from an " (updated)" suffix) that are regex metacharacters.
+// See patients.spec.ts's identical helper for why this escaping matters.
 function exact(text: string): RegExp {
   return new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
 }
 
-/**
- * A fresh, check-digit-valid CPF every run — brdoc validates the real
- * mod-11 algorithm against the backend, so a fixed literal would only pass
- * once; the second run collides with V1__create_patients.sql's own unique
- * constraint on cpf and gets a 409 instead of exercising the happy path.
- */
 function uniqueCpf(): string {
   const base = Array.from({ length: 9 }, () => Math.floor(Math.random() * 9));
   const digit = (nums: number[]) => {
@@ -38,34 +30,27 @@ test.beforeEach(async ({ page }) => {
   await expect(page).toHaveURL(/\/dashboard/);
 });
 
-test("registers a patient and lists them with a masked CPF", async ({ page }) => {
-  await page.goto("/dashboard/patients");
+test("registers, edits (without touching CPF), and deletes a doctor", async ({ page }) => {
+  await page.goto("/dashboard/doctors");
 
-  await page.getByRole("button", { name: /novo paciente|new patient|nuevo paciente/i }).click();
-
-  const fullName = `E2E Patient ${Date.now()}`;
+  const fullName = `Dr. E2E ${Date.now()}`;
+  await page.getByRole("button", { name: /novo médico|new doctor|nuevo médico/i }).click();
   await page.getByLabel(/nome completo|full name|nombre completo/i).fill(fullName);
   await page.getByLabel(/^cpf$/i).fill(uniqueCpf());
   await page.getByLabel(/email|correio|correo/i).fill(`${Date.now()}@example.com`);
-  await page.getByLabel(/cep|postcode|código postal/i).fill("01310-200");
-
+  await page.getByLabel(/specialty|especialidade|especialidad/i).fill("Cardiology");
+  await page.getByLabel(/licence|license|licença|crm|colegiado/i).fill(`LIC-${Date.now()}`);
   await page.getByRole("button", { name: /^criar$|^create$|^crear$/i }).click();
-
   await expect(page.getByText(fullName)).toBeVisible();
-  const row = page.getByRole("row", { name: exact(fullName) });
-  await expect(row.getByText(/\*{9}\d{2}/)).toBeVisible();
 
-  // Edit: change the name, confirm the table reflects it — and that the
-  // edit form genuinely has no CPF field (UpdatePatientRequest has none).
+  const row = page.getByRole("row", { name: exact(fullName) });
   await row.getByTitle(/edit|editar/i).click();
   await expect(page.getByLabel(/^cpf$/i)).toHaveCount(0);
-  const updatedName = `${fullName} (updated)`;
-  await page.getByLabel(/nome completo|full name|nombre completo/i).fill(updatedName);
+  await page.getByLabel(/specialty|especialidade|especialidad/i).fill("Cardiology and Vascular Surgery");
   await page.getByRole("button", { name: /^save$|^salvar$|^guardar$/i }).click();
-  await expect(page.getByText(updatedName)).toBeVisible();
+  await expect(page.getByText("Cardiology and Vascular Surgery")).toBeVisible();
 
-  // Delete: accept the native confirm and verify the row is gone.
   page.once("dialog", (dialog) => dialog.accept());
-  await page.getByRole("row", { name: exact(updatedName) }).getByTitle(/delete|excluir|eliminar/i).click();
-  await expect(page.getByText(updatedName)).not.toBeVisible();
+  await page.getByRole("row", { name: exact(fullName) }).getByTitle(/delete|excluir|eliminar/i).click();
+  await expect(page.getByText(fullName)).not.toBeVisible();
 });

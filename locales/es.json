@@ -51,7 +51,13 @@
     "previous": "Anterior",
     "next": "Siguiente",
     "page_info": "Página {page} de {total}",
-    "rows_per_page": "Filas por página"
+    "rows_per_page": "Filas por página",
+    "error_title": "Ocurrió un error",
+    "error_generic": "Ocurrió un error inesperado al cargar esta página.",
+    "try_again": "Intentar de nuevo",
+    "not_found_title": "Página no encontrada",
+    "not_found_body": "La página que buscas no existe o fue movida.",
+    "back_to_dashboard": "Volver al inicio"
   },
   "patients": {
     "title": "Pacientes",
