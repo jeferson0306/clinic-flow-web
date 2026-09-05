@@ -28,17 +28,34 @@ function SubmitButton() {
   );
 }
 
+function formFromDoctor(doctor: Doctor) {
+  return {
+    fullName: doctor.fullName,
+    email: doctor.email,
+    specialty: doctor.specialty,
+    licenseNumber: doctor.licenseNumber,
+  };
+}
+
 export function EditDoctorDialog({ doctor }: { doctor: Doctor }) {
   const [open, setOpen] = useState(false);
+  const [form, setForm] = useState(() => formFromDoctor(doctor));
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const { t } = useTranslation();
+
+  function set<K extends keyof ReturnType<typeof formFromDoctor>>(key: K, value: string) {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  }
 
   return (
     <Dialog
       open={open}
       onOpenChange={(next) => {
         setOpen(next);
-        if (!next) setFieldErrors({});
+        if (next) {
+          setForm(formFromDoctor(doctor));
+          setFieldErrors({});
+        }
       }}
       trigger={
         <button
@@ -54,12 +71,8 @@ export function EditDoctorDialog({ doctor }: { doctor: Doctor }) {
       <form
         action={async (formData) => {
           const errors: Record<string, string> = {};
-          if (!isValidName(String(formData.get("fullName") ?? ""))) {
-            errors.fullName = t("validation.invalid_name");
-          }
-          if (!isValidEmailShape(String(formData.get("email") ?? ""))) {
-            errors.email = t("validation.invalid_email");
-          }
+          if (!isValidName(form.fullName)) errors.fullName = t("validation.invalid_name");
+          if (!isValidEmailShape(form.email)) errors.email = t("validation.invalid_email");
           if (Object.keys(errors).length > 0) {
             setFieldErrors(errors);
             return;
@@ -71,6 +84,7 @@ export function EditDoctorDialog({ doctor }: { doctor: Doctor }) {
             toast.success(t("common.update_success"));
             setOpen(false);
           } else {
+            setFieldErrors(result.fieldErrors ?? {});
             toast.error(errorMessage(t, result.error) ?? t("common.error"));
           }
         }}
@@ -80,35 +94,36 @@ export function EditDoctorDialog({ doctor }: { doctor: Doctor }) {
         <Input
           label={t("doctors.full_name")}
           name="fullName"
-          defaultValue={doctor.fullName}
+          value={form.fullName}
           maxLength={120}
           error={fieldErrors.fullName}
-          onChange={(e) => {
-            e.target.value = sanitizeName(e.target.value);
-          }}
+          onChange={(e) => set("fullName", sanitizeName(e.target.value))}
           required
         />
         <Input
           label={t("doctors.email")}
           name="email"
           type="email"
-          defaultValue={doctor.email}
+          value={form.email}
           maxLength={254}
           error={fieldErrors.email}
+          onChange={(e) => set("email", e.target.value)}
           required
         />
         <Input
           label={t("doctors.specialty")}
           name="specialty"
-          defaultValue={doctor.specialty}
+          value={form.specialty}
           maxLength={120}
+          onChange={(e) => set("specialty", e.target.value)}
           required
         />
         <Input
           label={t("doctors.license_number")}
           name="licenseNumber"
-          defaultValue={doctor.licenseNumber}
+          value={form.licenseNumber}
           maxLength={40}
+          onChange={(e) => set("licenseNumber", e.target.value)}
           required
         />
         <SubmitButton />

@@ -60,13 +60,31 @@ export function isValidOptionalPhone(value: string): boolean {
   return digits === 0 || digits === 10 || digits === 11;
 }
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Local part <= 64, domain labels alphanumeric/hyphen, at least one dot — the
+// RFC 5321 length limits, not a claim that this is a fully correct email
+// grammar. Still a shape check only: brdoc decides real validity.
+const EMAIL_PATTERN = /^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]{1,64}@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+$/;
 
-/** A shape check only, deliberately loose — brdoc decides real validity. Rejects only what could not possibly be an email. */
 export function isValidEmailShape(value: string): boolean {
   return value.length <= 254 && EMAIL_PATTERN.test(value.trim());
 }
 
 export function todayIsoDate(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+/** Matches the backend's own bound: nobody registering as a patient is over 120. */
+const MAX_AGE_YEARS = 120;
+
+export function earliestBirthDateIso(): string {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() - MAX_AGE_YEARS);
+  return d.toISOString().slice(0, 10);
+}
+
+/** Empty is valid — birthDate is optional — anything else must be a real past date within a plausible lifespan. */
+export function isValidOptionalBirthDate(value: string): boolean {
+  if (!value) return true;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  return value < todayIsoDate() && value >= earliestBirthDateIso();
 }

@@ -11,9 +11,11 @@ import { Dialog } from "@/components/ui/dialog";
 import { useTranslation } from "@/lib/i18n";
 import type { Patient } from "@/lib/types";
 import {
+  earliestBirthDateIso,
   isCompletePostcode,
   isValidEmailShape,
   isValidName,
+  isValidOptionalBirthDate,
   isValidOptionalPhone,
   maskPhone,
   maskPostcode,
@@ -37,17 +39,35 @@ function SubmitButton() {
   );
 }
 
+function formFromPatient(patient: Patient) {
+  return {
+    fullName: patient.fullName,
+    email: patient.email,
+    phone: patient.phone ?? "",
+    birthDate: patient.birthDate ?? "",
+    postcode: patient.address.postcode,
+  };
+}
+
 export function EditPatientDialog({ patient }: { patient: Patient }) {
   const [open, setOpen] = useState(false);
+  const [form, setForm] = useState(() => formFromPatient(patient));
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const { t } = useTranslation();
+
+  function set<K extends keyof ReturnType<typeof formFromPatient>>(key: K, value: string) {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  }
 
   return (
     <Dialog
       open={open}
       onOpenChange={(next) => {
         setOpen(next);
-        if (!next) setFieldErrors({});
+        if (next) {
+          setForm(formFromPatient(patient));
+          setFieldErrors({});
+        }
       }}
       trigger={
         <button
@@ -63,18 +83,11 @@ export function EditPatientDialog({ patient }: { patient: Patient }) {
       <form
         action={async (formData) => {
           const errors: Record<string, string> = {};
-          if (!isValidName(String(formData.get("fullName") ?? ""))) {
-            errors.fullName = t("validation.invalid_name");
-          }
-          if (!isValidEmailShape(String(formData.get("email") ?? ""))) {
-            errors.email = t("validation.invalid_email");
-          }
-          if (!isValidOptionalPhone(String(formData.get("phone") ?? ""))) {
-            errors.phone = t("validation.invalid_phone");
-          }
-          if (!isCompletePostcode(String(formData.get("postcode") ?? ""))) {
-            errors.postcode = t("validation.invalid_postcode");
-          }
+          if (!isValidName(form.fullName)) errors.fullName = t("validation.invalid_name");
+          if (!isValidEmailShape(form.email)) errors.email = t("validation.invalid_email");
+          if (!isValidOptionalPhone(form.phone)) errors.phone = t("validation.invalid_phone");
+          if (!isValidOptionalBirthDate(form.birthDate)) errors.birthDate = t("validation.invalid_birth_date");
+          if (!isCompletePostcode(form.postcode)) errors.postcode = t("validation.invalid_postcode");
           if (Object.keys(errors).length > 0) {
             setFieldErrors(errors);
             return;
@@ -86,6 +99,7 @@ export function EditPatientDialog({ patient }: { patient: Patient }) {
             toast.success(t("common.update_success"));
             setOpen(false);
           } else {
+            setFieldErrors(result.fieldErrors ?? {});
             toast.error(errorMessage(t, result.error) ?? t("common.error"));
           }
         }}
@@ -95,52 +109,50 @@ export function EditPatientDialog({ patient }: { patient: Patient }) {
         <Input
           label={t("patients.full_name")}
           name="fullName"
-          defaultValue={patient.fullName}
+          value={form.fullName}
           maxLength={120}
           error={fieldErrors.fullName}
-          onChange={(e) => {
-            e.target.value = sanitizeName(e.target.value);
-          }}
+          onChange={(e) => set("fullName", sanitizeName(e.target.value))}
           required
         />
         <Input
           label={t("patients.email")}
           name="email"
           type="email"
-          defaultValue={patient.email}
+          value={form.email}
           maxLength={254}
           error={fieldErrors.email}
+          onChange={(e) => set("email", e.target.value)}
           required
         />
         <Input
           label={`${t("patients.phone")} (${t("patients.phone_optional")})`}
           name="phone"
-          defaultValue={patient.phone ?? ""}
           inputMode="numeric"
+          value={form.phone}
           maxLength={15}
           error={fieldErrors.phone}
-          onChange={(e) => {
-            e.target.value = maskPhone(e.target.value);
-          }}
+          onChange={(e) => set("phone", maskPhone(e.target.value))}
         />
         <Input
           label={`${t("patients.birth_date")} (${t("patients.birth_date_optional")})`}
           name="birthDate"
           type="date"
-          defaultValue={patient.birthDate ?? ""}
+          value={form.birthDate}
+          min={earliestBirthDateIso()}
           max={todayIsoDate()}
+          error={fieldErrors.birthDate}
+          onChange={(e) => set("birthDate", e.target.value)}
         />
         <Input
           label={t("patients.postcode")}
           name="postcode"
           placeholder="00000-000"
-          defaultValue={patient.address.postcode}
           inputMode="numeric"
+          value={form.postcode}
           maxLength={9}
           error={fieldErrors.postcode}
-          onChange={(e) => {
-            e.target.value = maskPostcode(e.target.value);
-          }}
+          onChange={(e) => set("postcode", maskPostcode(e.target.value))}
           required
         />
         <SubmitButton />

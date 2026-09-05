@@ -154,6 +154,7 @@
     "invalid_cpf": "CPF inválido: deve ter 11 dígitos.",
     "invalid_email": "E-mail inválido.",
     "invalid_phone": "Telefone inválido: use 10 ou 11 dígitos.",
-    "invalid_postcode": "CEP inválido: deve ter 8 dígitos."
+    "invalid_postcode": "CEP inválido: deve ter 8 dígitos.",
+    "invalid_birth_date": "Data de nascimento inválida: não pode ser no futuro nem anterior a 120 anos."
   }
 }

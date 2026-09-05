@@ -154,6 +154,7 @@
     "invalid_cpf": "Invalid CPF: must have 11 digits.",
     "invalid_email": "Invalid email address.",
     "invalid_phone": "Invalid phone: use 10 or 11 digits.",
-    "invalid_postcode": "Invalid postcode: must have 8 digits."
+    "invalid_postcode": "Invalid postcode: must have 8 digits.",
+    "invalid_birth_date": "Invalid birth date: cannot be in the future or more than 120 years ago."
   }
 }
