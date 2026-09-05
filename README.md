@@ -101,10 +101,21 @@ register patients/doctors/procedures and schedule/cancel appointments) or `docto
 
 ```bash
 pnpm typecheck   # tsc --noEmit
-pnpm lint        # eslint . (flat config, eslint-config-next)
+pnpm lint        # eslint . --max-warnings 0 (flat config, eslint-config-next)
 pnpm test        # vitest — pure functions only (validations/br.ts, lib/utils.ts), no network
 pnpm test:e2e    # playwright — needs the real backend running, see above
+pnpm audit       # dependency vulnerabilities — expect none; see below if it isn't
 ```
+
+**`eslint` is pinned to `9.x` on purpose.** `10.x` crashes on this project twice over:
+`eslint-config-next`'s legacy shareable configs go through `FlatCompat`, whose
+config-validation error path itself throws (`Converting circular structure to JSON`)
+on a plugin`eslint-plugin-react` ships — worked around here by importing
+`eslint-config-next/core-web-vitals` and `/typescript` directly instead of through
+`FlatCompat`, but `eslint-plugin-react` 7.37.5 *also* throws under `eslint@10`'s new
+rule-context API (`contextOrFilename.getFilename is not a function`), independent of
+that fix. Don't bump past `9.x` until `eslint-plugin-react` (a transitive dependency of
+`eslint-config-next`, not one this project can pin directly) catches up.
 
 Unit tests cover the Brazilian data validators/formatters (`validations/br.ts`) and
 `lib/utils.ts`'s formatters — deliberately network-free so they run in CI without a

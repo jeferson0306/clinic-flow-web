@@ -37,6 +37,12 @@ export function DataTable<T extends { id: string }>({
   const bodyRef = useRef<HTMLTableSectionElement>(null);
   const { t } = useTranslation();
 
+  // TanStack Table's own instance carries functions the React Compiler
+  // cannot memoize — a real constraint on projects that enable it, but this
+  // one has no babel-plugin-react-compiler in its build at all, so there is
+  // no memoization for it to skip. Suppressed rather than left as a warning
+  // with no action anyone will ever take on it.
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,

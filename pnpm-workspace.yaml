@@ -2,3 +2,15 @@ allowBuilds:
   esbuild: true
   sharp: true
   unrs-resolver: true
+
+# Transitive dev-tooling deps (vite/vitest/@tailwindcss postcss) that
+# resolved to versions with known advisories — none reachable from the
+# production bundle, but pinned to patched versions anyway rather than
+# leaving `pnpm audit` with findings nobody acts on. Re-check whether these
+# are still needed the next time a direct dependency bump pulls a newer
+# transitive version on its own.
+overrides:
+  postcss: ">=8.5.23"
+  nanoid: ">=3.3.18"
+  browserslist: ">=4.28.7"
+  esbuild: ">=0.28.1"
