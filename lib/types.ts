@@ -71,3 +71,17 @@ export type Availability = {
 };
 
 export type LoginResponse = { token: string; expiresInSeconds: number; role: Role };
+
+export type HealthCheckStatus = "UP" | "DOWN";
+
+export type HealthCheck = { name: string; status: HealthCheckStatus; data?: Record<string, unknown> };
+
+export type HealthReport = { status: HealthCheckStatus; checks: HealthCheck[] };
+
+export type RecentError = {
+  timestamp: string;
+  status: number;
+  exceptionType: string;
+  path: string | null;
+  traceId: string;
+};

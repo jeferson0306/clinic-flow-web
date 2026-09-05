@@ -9,7 +9,8 @@
     "procedures": "Procedimientos",
     "appointments": "Consultas",
     "calendar": "Agenda",
-    "exams": "Exámenes"
+    "exams": "Exámenes",
+    "system_health": "Estado del sistema"
   },
   "auth": {
     "login": "Iniciar sesión",
@@ -156,5 +157,25 @@
     "invalid_phone": "Teléfono inválido: use 10 u 11 dígitos.",
     "invalid_postcode": "Código postal inválido: debe tener 8 dígitos.",
     "invalid_birth_date": "Fecha de nacimiento inválida: no puede ser futura ni anterior a 120 años."
+  },
+  "system_health": {
+    "title": "Estado del sistema",
+    "subtitle": "Salud del backend y errores recientes — solo administradores.",
+    "refresh": "Actualizar",
+    "backend_status": "Estado del backend",
+    "database": "Base de datos",
+    "brdoc": "Servicio brdoc",
+    "up": "Activo",
+    "down": "Inactivo",
+    "unreachable": "Backend inaccesible",
+    "recent_errors": "Errores recientes",
+    "recent_errors_hint": "Últimos 200 errores en memoria — se pierden en cada reinicio del servicio. Para el historial completo, consulta los logs de Render.",
+    "no_errors": "Sin errores registrados.",
+    "time": "Hora",
+    "status_code": "Estado",
+    "exception_type": "Tipo",
+    "path": "Ruta",
+    "trace_id": "ID de rastreo",
+    "forbidden": "Esta página es solo para administradores."
   }
 }

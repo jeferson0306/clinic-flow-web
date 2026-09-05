@@ -5,9 +5,11 @@ import type {
   Availability,
   Doctor,
   Exam,
+  HealthReport,
   LoginResponse,
   Patient,
   Procedure,
+  RecentError,
 } from "@/lib/types";
 
 const API_URL = process.env.CLINIC_FLOW_API_URL || "http://localhost:8080";
@@ -76,6 +78,22 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
+}
+
+/**
+ * /q/health answers 503 on a DOWN check, not just 200 — a status this page
+ * needs to show, not treat as a request failure the way `request()`'s
+ * ApiError handling would. Network failure (the backend is unreachable, not
+ * just unhealthy) is reported the same shape as a real DOWN so the page has
+ * one thing to render either way.
+ */
+async function fetchHealth(): Promise<HealthReport> {
+  try {
+    const res = await fetch(`${API_URL}/q/health`, { cache: "no-store" });
+    return (await res.json()) as HealthReport;
+  } catch {
+    return { status: "DOWN", checks: [] };
+  }
 }
 
 export const api = {
@@ -154,5 +172,10 @@ export const api = {
     }) => request<Appointment>("/v1/appointments", { method: "POST", body: data }),
     cancel: (id: string) =>
       request<Appointment>(`/v1/appointments/${id}/cancel`, { method: "POST" }),
+  },
+
+  systemHealth: {
+    health: fetchHealth,
+    recentErrors: () => request<RecentError[]>("/v1/admin/recent-errors"),
   },
 };

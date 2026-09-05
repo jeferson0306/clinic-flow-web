@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
+  Activity,
   CalendarClock,
   CalendarDays,
   ChevronsLeft,
@@ -18,6 +19,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n";
+import type { Role } from "@/lib/types";
 
 const NAV_ITEMS = [
   { key: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -29,14 +31,20 @@ const NAV_ITEMS = [
   { key: "nav.exams", href: "/dashboard/exams", icon: FlaskConical },
 ] as const;
 
+const ADMIN_NAV_ITEMS = [
+  { key: "nav.system_health", href: "/dashboard/system-health", icon: Activity },
+] as const;
+
 const COLLAPSE_KEY = "sidebar-collapsed";
 
 export function Sidebar({
   mobileOpen,
   onCloseMobile,
+  role,
 }: {
   mobileOpen: boolean;
   onCloseMobile: () => void;
+  role: Role;
 }) {
   const pathname = usePathname();
   const { t } = useTranslation();
@@ -121,7 +129,7 @@ export function Sidebar({
         </div>
 
       <nav className="flex-1 py-2 overflow-y-auto">
-        {NAV_ITEMS.map(({ key, href, icon: Icon }) => {
+        {[...NAV_ITEMS, ...(role === "ADMIN" ? ADMIN_NAV_ITEMS : [])].map(({ key, href, icon: Icon }) => {
           const isActive = pathname === href || pathname.startsWith(`${href}/`);
           return (
             <Link

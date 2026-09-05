@@ -9,7 +9,8 @@
     "procedures": "Procedures",
     "appointments": "Appointments",
     "calendar": "Calendar",
-    "exams": "Exams"
+    "exams": "Exams",
+    "system_health": "System health"
   },
   "auth": {
     "login": "Sign in",
@@ -156,5 +157,25 @@
     "invalid_phone": "Invalid phone: use 10 or 11 digits.",
     "invalid_postcode": "Invalid postcode: must have 8 digits.",
     "invalid_birth_date": "Invalid birth date: cannot be in the future or more than 120 years ago."
+  },
+  "system_health": {
+    "title": "System health",
+    "subtitle": "Backend health and recent errors — administrators only.",
+    "refresh": "Refresh",
+    "backend_status": "Backend status",
+    "database": "Database",
+    "brdoc": "brdoc service",
+    "up": "Up",
+    "down": "Down",
+    "unreachable": "Backend unreachable",
+    "recent_errors": "Recent errors",
+    "recent_errors_hint": "Last 200 errors, kept in memory — lost on every service restart. For full history, check Render's own logs.",
+    "no_errors": "No errors recorded.",
+    "time": "Time",
+    "status_code": "Status",
+    "exception_type": "Type",
+    "path": "Path",
+    "trace_id": "Trace ID",
+    "forbidden": "This page is for administrators only."
   }
 }

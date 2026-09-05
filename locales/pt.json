@@ -9,7 +9,8 @@
     "procedures": "Procedimentos",
     "appointments": "Consultas",
     "calendar": "Agenda",
-    "exams": "Exames"
+    "exams": "Exames",
+    "system_health": "Estado do sistema"
   },
   "auth": {
     "login": "Entrar",
@@ -156,5 +157,25 @@
     "invalid_phone": "Telefone inválido: use 10 ou 11 dígitos.",
     "invalid_postcode": "CEP inválido: deve ter 8 dígitos.",
     "invalid_birth_date": "Data de nascimento inválida: não pode ser no futuro nem anterior a 120 anos."
+  },
+  "system_health": {
+    "title": "Estado do sistema",
+    "subtitle": "Saúde do backend e erros recentes — apenas para administradores.",
+    "refresh": "Atualizar",
+    "backend_status": "Estado do backend",
+    "database": "Base de dados",
+    "brdoc": "Serviço brdoc",
+    "up": "Ativo",
+    "down": "Inativo",
+    "unreachable": "Backend inacessível",
+    "recent_errors": "Erros recentes",
+    "recent_errors_hint": "Últimos 200 erros em memória — perdidos a cada reinício do serviço. Para o histórico completo, consulta os logs do Render.",
+    "no_errors": "Sem erros registados.",
+    "time": "Hora",
+    "status_code": "Estado",
+    "exception_type": "Tipo",
+    "path": "Rota",
+    "trace_id": "ID de rastreio",
+    "forbidden": "Esta página é exclusiva para administradores."
   }
 }
