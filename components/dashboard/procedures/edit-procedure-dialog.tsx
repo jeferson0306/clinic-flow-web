@@ -50,7 +50,7 @@ export function EditProcedureDialog({ procedure }: { procedure: Procedure }) {
             toast.error(t("common.error"));
           }
         }}
-        className="flex flex-col gap-3"
+        className="flex flex-col gap-3" noValidate
       >
         <input type="hidden" name="id" value={procedure.id} />
         <Input

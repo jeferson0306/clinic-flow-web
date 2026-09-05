@@ -44,7 +44,7 @@ export function RecordResultDialog({ examId }: { examId: string }) {
             toast.error(t("common.error"));
           }
         }}
-        className="flex flex-col gap-3"
+        className="flex flex-col gap-3" noValidate
       >
         <input type="hidden" name="id" value={examId} />
         <div className="flex flex-col gap-1.5">

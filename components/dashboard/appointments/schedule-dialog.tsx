@@ -92,7 +92,7 @@ export function ScheduleDialog({
             toast.error(t("common.error"));
           }
         }}
-        className="flex flex-col gap-3"
+        className="flex flex-col gap-3" noValidate
       >
         <Combobox
           label={t("appointments.patient")}

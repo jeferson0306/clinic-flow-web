@@ -45,7 +45,7 @@ export function NewProcedureDialog() {
             toast.error(t("common.error"));
           }
         }}
-        className="flex flex-col gap-3"
+        className="flex flex-col gap-3" noValidate
       >
         <Input label={t("procedures.name")} name="name" maxLength={120} required />
         <Input

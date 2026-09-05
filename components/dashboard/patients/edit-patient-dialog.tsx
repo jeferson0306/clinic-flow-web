@@ -103,7 +103,7 @@ export function EditPatientDialog({ patient }: { patient: Patient }) {
             toast.error(errorMessage(t, result.error) ?? t("common.error"));
           }
         }}
-        className="flex flex-col gap-3"
+        className="flex flex-col gap-3" noValidate
       >
         <input type="hidden" name="id" value={patient.id} />
         <Input

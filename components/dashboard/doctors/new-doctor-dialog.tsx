@@ -78,7 +78,7 @@ export function NewDoctorDialog() {
             toast.error(errorMessage(t, result.error) ?? t("common.error"));
           }
         }}
-        className="flex flex-col gap-3"
+        className="flex flex-col gap-3" noValidate
       >
         <Input
           label={t("doctors.full_name")}

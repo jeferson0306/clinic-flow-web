@@ -55,7 +55,7 @@ export function NewExamDialog({ patients, doctors }: { patients: Patient[]; doct
             toast.error(t("common.error"));
           }
         }}
-        className="flex flex-col gap-3"
+        className="flex flex-col gap-3" noValidate
       >
         <Combobox
           label={t("exams.patient")}
