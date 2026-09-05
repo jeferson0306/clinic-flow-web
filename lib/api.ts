@@ -10,7 +10,7 @@ import type {
   Procedure,
 } from "@/lib/types";
 
-const API_URL = process.env.CLINIC_FLOW_API_URL ?? "http://localhost:8080";
+const API_URL = process.env.CLINIC_FLOW_API_URL || "http://localhost:8080";
 
 export type ApiErrorBody = {
   field: string | null;
