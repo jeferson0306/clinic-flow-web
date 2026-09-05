@@ -53,12 +53,19 @@ export function EditProcedureDialog({ procedure }: { procedure: Procedure }) {
         className="flex flex-col gap-3"
       >
         <input type="hidden" name="id" value={procedure.id} />
-        <Input label={t("procedures.name")} name="name" defaultValue={procedure.name} required />
+        <Input
+          label={t("procedures.name")}
+          name="name"
+          defaultValue={procedure.name}
+          maxLength={120}
+          required
+        />
         <Input
           label={t("procedures.duration")}
           name="durationMinutes"
           type="number"
           min={1}
+          max={480}
           defaultValue={procedure.durationMinutes}
           required
         />
@@ -67,6 +74,7 @@ export function EditProcedureDialog({ procedure }: { procedure: Procedure }) {
           name="price"
           type="number"
           min={0.01}
+          max={100000}
           step="0.01"
           defaultValue={(procedure.priceCents / 100).toFixed(2)}
           required

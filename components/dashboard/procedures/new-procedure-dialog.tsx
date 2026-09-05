@@ -47,9 +47,24 @@ export function NewProcedureDialog() {
         }}
         className="flex flex-col gap-3"
       >
-        <Input label={t("procedures.name")} name="name" required />
-        <Input label={t("procedures.duration")} name="durationMinutes" type="number" min={1} required />
-        <Input label={`${t("procedures.price")} (R$)`} name="price" type="number" min={0.01} step="0.01" required />
+        <Input label={t("procedures.name")} name="name" maxLength={120} required />
+        <Input
+          label={t("procedures.duration")}
+          name="durationMinutes"
+          type="number"
+          min={1}
+          max={480}
+          required
+        />
+        <Input
+          label={`${t("procedures.price")} (R$)`}
+          name="price"
+          type="number"
+          min={0.01}
+          max={100000}
+          step="0.01"
+          required
+        />
         <SubmitButton />
       </form>
     </Dialog>

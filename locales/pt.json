@@ -148,5 +148,12 @@
     "doctors_total": "Médicos ativos",
     "procedures_total": "Procedimentos no catálogo",
     "quick_actions": "Ações rápidas"
+  },
+  "validation": {
+    "invalid_name": "Nome inválido: use apenas letras e espaços (3-120 caracteres).",
+    "invalid_cpf": "CPF inválido: deve ter 11 dígitos.",
+    "invalid_email": "E-mail inválido.",
+    "invalid_phone": "Telefone inválido: use 10 ou 11 dígitos.",
+    "invalid_postcode": "CEP inválido: deve ter 8 dígitos."
   }
 }
