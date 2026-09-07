@@ -11,7 +11,8 @@ import { Dialog } from "@/components/ui/dialog";
 import { useTranslation } from "@/lib/i18n";
 import {
   earliestBirthDateIso,
-  isCompleteCpf,
+  firstFieldErrorMessage,
+  isValidCpf,
   isCompletePostcode,
   isValidEmailShape,
   isValidName,
@@ -28,11 +29,10 @@ const INITIAL_STATE: FormState = { error: null };
 
 const EMPTY_FORM = { fullName: "", cpf: "", email: "", phone: "", birthDate: "", postcode: "" };
 
+/** Only the categories with a nicer localized message than the backend's own raw text — everything else falls through to that raw message instead. */
 function errorMessage(t: (k: string) => string, error: string | null): string | null {
-  if (!error) return null;
-  if (error === "missing_fields") return t("common.error");
   if (error === "CONFLICT") return t("patients.duplicate_cpf");
-  return t("common.error");
+  return null;
 }
 
 function SubmitButton() {
@@ -76,7 +76,7 @@ export function NewPatientDialog() {
         action={async (formData) => {
           const errors: Record<string, string> = {};
           if (!isValidName(form.fullName)) errors.fullName = t("validation.invalid_name");
-          if (!isCompleteCpf(form.cpf)) errors.cpf = t("validation.invalid_cpf");
+          if (!isValidCpf(form.cpf)) errors.cpf = t("validation.invalid_cpf");
           if (!isValidEmailShape(form.email)) errors.email = t("validation.invalid_email");
           if (!isValidOptionalPhone(form.phone)) errors.phone = t("validation.invalid_phone");
           if (!isValidOptionalBirthDate(form.birthDate)) errors.birthDate = t("validation.invalid_birth_date");
@@ -94,7 +94,7 @@ export function NewPatientDialog() {
             setOpen(false);
           } else {
             setFieldErrors(result.fieldErrors ?? {});
-            toast.error(errorMessage(t, result.error) ?? t("common.error"));
+            toast.error(errorMessage(t, result.error) ?? firstFieldErrorMessage(result.fieldErrors) ?? t("common.error"));
           }
         }}
         className="flex flex-col gap-3" noValidate

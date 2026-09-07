@@ -9,14 +9,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog } from "@/components/ui/dialog";
 import { useTranslation } from "@/lib/i18n";
-import { isCompleteCpf, isValidEmailShape, isValidName, maskCpf, sanitizeName } from "@/lib/validation";
+import {
+  firstFieldErrorMessage,
+  isValidCpf,
+  isValidEmailShape,
+  isValidName,
+  maskCpf,
+  sanitizeName,
+} from "@/lib/validation";
 
 const EMPTY_FORM = { fullName: "", cpf: "", email: "", specialty: "", licenseNumber: "" };
 
+/** Only the categories with a nicer localized message than the backend's own raw text — everything else falls through to that raw message instead. */
 function errorMessage(t: (k: string) => string, error: string | null): string | null {
-  if (!error) return null;
   if (error === "CONFLICT") return t("doctors.duplicate");
-  return t("common.error");
+  return null;
 }
 
 function SubmitButton() {
@@ -60,7 +67,7 @@ export function NewDoctorDialog() {
         action={async (formData) => {
           const errors: Record<string, string> = {};
           if (!isValidName(form.fullName)) errors.fullName = t("validation.invalid_name");
-          if (!isCompleteCpf(form.cpf)) errors.cpf = t("validation.invalid_cpf");
+          if (!isValidCpf(form.cpf)) errors.cpf = t("validation.invalid_cpf");
           if (!isValidEmailShape(form.email)) errors.email = t("validation.invalid_email");
           if (Object.keys(errors).length > 0) {
             setFieldErrors(errors);
@@ -75,7 +82,7 @@ export function NewDoctorDialog() {
             setOpen(false);
           } else {
             setFieldErrors(result.fieldErrors ?? {});
-            toast.error(errorMessage(t, result.error) ?? t("common.error"));
+            toast.error(errorMessage(t, result.error) ?? firstFieldErrorMessage(result.fieldErrors) ?? t("common.error"));
           }
         }}
         className="flex flex-col gap-3" noValidate

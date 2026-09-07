@@ -10,12 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Dialog } from "@/components/ui/dialog";
 import { useTranslation } from "@/lib/i18n";
 import type { Doctor } from "@/lib/types";
-import { isValidEmailShape, isValidName, sanitizeName } from "@/lib/validation";
+import { firstFieldErrorMessage, isValidEmailShape, isValidName, sanitizeName } from "@/lib/validation";
 
+/** Only the categories with a nicer localized message than the backend's own raw text — everything else falls through to that raw message instead. */
 function errorMessage(t: (k: string) => string, error: string | null): string | null {
-  if (!error) return null;
   if (error === "CONFLICT") return t("doctors.duplicate");
-  return t("common.error");
+  return null;
 }
 
 function SubmitButton() {
@@ -85,7 +85,7 @@ export function EditDoctorDialog({ doctor }: { doctor: Doctor }) {
             setOpen(false);
           } else {
             setFieldErrors(result.fieldErrors ?? {});
-            toast.error(errorMessage(t, result.error) ?? t("common.error"));
+            toast.error(errorMessage(t, result.error) ?? firstFieldErrorMessage(result.fieldErrors) ?? t("common.error"));
           }
         }}
         className="flex flex-col gap-3" noValidate

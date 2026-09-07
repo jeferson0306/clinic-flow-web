@@ -12,6 +12,7 @@ import { useTranslation } from "@/lib/i18n";
 import type { Patient } from "@/lib/types";
 import {
   earliestBirthDateIso,
+  firstFieldErrorMessage,
   isCompletePostcode,
   isValidEmailShape,
   isValidName,
@@ -22,12 +23,6 @@ import {
   sanitizeName,
   todayIsoDate,
 } from "@/lib/validation";
-
-function errorMessage(t: (k: string) => string, error: string | null): string | null {
-  if (!error) return null;
-  if (error === "missing_fields") return t("common.error");
-  return t("common.error");
-}
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -100,7 +95,7 @@ export function EditPatientDialog({ patient }: { patient: Patient }) {
             setOpen(false);
           } else {
             setFieldErrors(result.fieldErrors ?? {});
-            toast.error(errorMessage(t, result.error) ?? t("common.error"));
+            toast.error(firstFieldErrorMessage(result.fieldErrors) ?? t("common.error"));
           }
         }}
         className="flex flex-col gap-3" noValidate

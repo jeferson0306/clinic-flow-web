@@ -37,6 +37,29 @@ export function isCompleteCpf(value: string): boolean {
   return onlyDigits(value).length === 11;
 }
 
+/**
+ * The real mod-11 check-digit algorithm — not a call to brdoc, which still
+ * has the final say (it also catches the well-known all-same-digit CPFs
+ * this checksum alone lets through, e.g. 111.111.111-11). This exists to
+ * catch a wrong CPF before spending a network round-trip on one that was
+ * never going to pass: found live when a shape-only check ("11 digits")
+ * let a checksum-invalid CPF through to brdoc, which rejected it with no
+ * indication in the UI of why.
+ */
+export function isValidCpf(value: string): boolean {
+  const digits = onlyDigits(value);
+  if (digits.length !== 11 || /^(\d)\1{10}$/.test(digits)) return false;
+
+  const checkDigit = (length: number): number => {
+    let sum = 0;
+    for (let i = 0; i < length; i++) sum += Number(digits[i]) * (length + 1 - i);
+    const remainder = sum % 11;
+    return remainder < 2 ? 0 : 11 - remainder;
+  };
+
+  return checkDigit(9) === Number(digits[9]) && checkDigit(10) === Number(digits[10]);
+}
+
 export function maskPostcode(value: string): string {
   const digits = onlyDigits(value).slice(0, 8);
   return digits.replace(/(\d{5})(\d)/, "$1-$2");
@@ -87,4 +110,15 @@ export function isValidOptionalBirthDate(value: string): boolean {
   if (!value) return true;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
   return value < todayIsoDate() && value >= earliestBirthDateIso();
+}
+
+/**
+ * The backend already sends a specific, human-readable reason (brdoc's own
+ * message, or a Bean Validation one) in `fieldErrors` — prefer that in a
+ * toast over a generic "something went wrong", which told the user nothing
+ * about which field was rejected or why.
+ */
+export function firstFieldErrorMessage(fieldErrors: Record<string, string> | undefined): string | null {
+  const values = Object.values(fieldErrors ?? {});
+  return values.length > 0 ? values[0] : null;
 }
