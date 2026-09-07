@@ -22,8 +22,8 @@
     "invalid_credentials": "Incorrect username or password",
     "missing_fields": "Enter your username and password",
     "unknown_error": "Could not sign in. Please try again.",
-    "demo_hint": "Demo accounts: admin / admin123 (ADMIN) and doctor / doctor123 (DOCTOR)",
-    "signed_in_as": "Signed in as"
+    "signed_in_as": "Signed in as",
+    "request_access": "Don't have access yet? Request a demo"
   },
   "common": {
     "save": "Save",
@@ -188,7 +188,7 @@
     "hero_subhead": "Patients, doctors, appointments and exams in one place — no spreadsheets, no double-booked slots.",
     "hero_cta_primary": "See live demo",
     "hero_cta_secondary": "View code on GitHub",
-    "hero_note": "No sign-up — log straight in with a demo account.",
+    "hero_note": "No public login — request access and get credentials by email.",
     "mock_patients": "Patients",
     "mock_today": "Today",
     "mock_no_conflict": "No scheduling conflicts",
@@ -218,11 +218,9 @@
     "how_step3_title": "See the code",
     "how_step3_body": "Architecture, tests and documented decisions on GitHub.",
     "cta_title": "Ready to look inside?",
-    "cta_body": "Two demo accounts, ready to go — nothing to sign up for.",
-    "cta_admin_label": "Admin",
-    "cta_doctor_label": "Doctor",
-    "cta_button": "Log in now",
-    "cta_cold_start": "The backend runs on a free tier and may sleep after 15 minutes idle — the first request of the day can take about 30 seconds.",
+    "cta_body": "Request access — I'll reply by email with the demo credentials.",
+    "cta_button": "Request demo",
+    "cta_cold_start": "The backend runs on a free tier and may sleep after 15 minutes idle — once you have access, the first request of the day can take about 30 seconds.",
     "faq_title": "Frequently asked questions",
     "faq_q1": "Is it free?",
     "faq_a1": "Yes, it's an open portfolio project, free to explore.",
@@ -232,6 +230,13 @@
     "faq_a3": "Yes, both repositories (backend and frontend) are public on GitHub.",
     "footer_tagline": "Clinic management system — portfolio project.",
     "footer_stack": "Java 25 · Quarkus · Next.js 16 · React 19 · PostgreSQL · AWS",
-    "footer_made_by": "Made by Jeferson Siqueira"
+    "footer_made_by": "Made by Jeferson Siqueira",
+    "request_title": "Request demo access",
+    "request_body": "Fill in your details — this opens your email client with the request ready to send.",
+    "request_name": "Name",
+    "request_email": "Email",
+    "request_message": "Message (optional)",
+    "request_submit": "Open email",
+    "request_toast": "Opening your email client..."
   }
 }

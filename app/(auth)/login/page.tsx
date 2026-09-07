@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+import Link from "next/link";
 import { login, type LoginState } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,7 +69,11 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="mt-4 text-center text-xs text-[var(--text-muted)]">{t("auth.demo_hint")}</p>
+        <p className="mt-4 text-center text-xs text-[var(--text-muted)]">
+          <Link href="/#request-demo" className="text-[var(--accent)] hover:underline">
+            {t("auth.request_access")}
+          </Link>
+        </p>
       </div>
     </div>
   );

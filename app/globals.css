@@ -113,3 +113,25 @@ html.light ::-webkit-scrollbar-thumb:hover {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* ── Landing page ─────────────────────────────────────────────── */
+.feature-card {
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-card {
+    transition: none;
+  }
+  .feature-card:hover {
+    transform: none;
+  }
+}

@@ -22,8 +22,8 @@
     "invalid_credentials": "Utilizador ou senha incorretos",
     "missing_fields": "Preencha o utilizador e a senha",
     "unknown_error": "Não foi possível entrar. Tente novamente.",
-    "demo_hint": "Contas de demonstração: admin / admin123 (ADMIN) e doctor / doctor123 (DOCTOR)",
-    "signed_in_as": "Sessão iniciada como"
+    "signed_in_as": "Sessão iniciada como",
+    "request_access": "Ainda não tens acesso? Pede uma demo"
   },
   "common": {
     "save": "Salvar",
@@ -188,7 +188,7 @@
     "hero_subhead": "Pacientes, médicos, consultas e exames num só lugar — sem planilhas, sem duplicidade de agenda.",
     "hero_cta_primary": "Ver demo ao vivo",
     "hero_cta_secondary": "Ver código no GitHub",
-    "hero_note": "Sem cadastro — entra direto com uma conta de demonstração.",
+    "hero_note": "Sem login público — pede acesso e recebes as credenciais por email.",
     "mock_patients": "Pacientes",
     "mock_today": "Hoje",
     "mock_no_conflict": "Sem conflitos de agenda",
@@ -218,11 +218,9 @@
     "how_step3_title": "Vê o código",
     "how_step3_body": "Arquitetura, testes e decisões documentadas no GitHub.",
     "cta_title": "Pronto para ver por dentro?",
-    "cta_body": "Duas contas de demonstração, já prontas — não precisas de criar nada.",
-    "cta_admin_label": "Administrador",
-    "cta_doctor_label": "Médico",
-    "cta_button": "Entrar agora",
-    "cta_cold_start": "O backend está em hospedagem gratuita e pode adormecer após 15 min sem uso — o primeiro pedido do dia pode demorar cerca de 30 segundos.",
+    "cta_body": "Pede acesso — respondo por email com as credenciais de demonstração.",
+    "cta_button": "Solicitar demo",
+    "cta_cold_start": "O backend corre em hospedagem gratuita e pode adormecer após 15 min sem uso — depois de teres acesso, o primeiro pedido do dia pode demorar cerca de 30 segundos.",
     "faq_title": "Perguntas frequentes",
     "faq_q1": "É grátis?",
     "faq_a1": "Sim, é um projeto de portfólio, aberto e sem custo para explorar.",
@@ -232,6 +230,13 @@
     "faq_a3": "Sim, os dois repositórios (backend e frontend) são públicos no GitHub.",
     "footer_tagline": "Sistema de gestão de clínica — projeto de portfólio.",
     "footer_stack": "Java 25 · Quarkus · Next.js 16 · React 19 · PostgreSQL · AWS",
-    "footer_made_by": "Feito por Jeferson Siqueira"
+    "footer_made_by": "Feito por Jeferson Siqueira",
+    "request_title": "Solicitar acesso à demo",
+    "request_body": "Preenche os teus dados — vamos abrir o teu cliente de email já com o pedido pronto a enviar.",
+    "request_name": "Nome",
+    "request_email": "E-mail",
+    "request_message": "Mensagem (opcional)",
+    "request_submit": "Abrir email",
+    "request_toast": "A abrir o teu cliente de email..."
   }
 }

@@ -1,6 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { animate } from "animejs";
 import {
   Activity,
   ArrowRight,
@@ -8,7 +11,9 @@ import {
   ClipboardList,
   FlaskConical,
   Github,
+  HeartPulse,
   Moon,
+  Pill,
   Plus,
   Stethoscope,
   Sun,
@@ -17,9 +22,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/lib/theme";
 import { LOCALE_LABELS, useTranslation, type Locale } from "@/lib/i18n";
+import { RequestDemoDialog } from "@/components/marketing/request-demo-dialog";
 
-const BACKEND_REPO = "https://github.com/jeferson0306/clinic-flow";
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
 const FRONTEND_REPO = "https://github.com/jeferson0306/clinic-flow-web";
+const BACKEND_REPO = "https://github.com/jeferson0306/clinic-flow";
+const REQUEST_HASH = "#request-demo";
 
 const FEATURES = [
   { icon: Users, titleKey: "landing.feature_patients_title", bodyKey: "landing.feature_patients_body" },
@@ -40,12 +51,76 @@ function Logo() {
   );
 }
 
-function Navbar() {
+/** A cardiac-monitor-style trace, quietly sweeping — the one health motif that earns its place without shouting for attention. */
+function HeartbeatLine({ className }: { className?: string }) {
+  const trackRef = useRef<SVGGElement>(null);
+
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced || !trackRef.current) return;
+    const tween = gsap.to(trackRef.current, { xPercent: -50, duration: 9, ease: "none", repeat: -1 });
+    return () => {
+      tween.kill();
+    };
+  }, []);
+
+  const wave = "M0,20 L60,20 L72,20 L80,4 L90,36 L98,20 L400,20";
+  return (
+    <svg viewBox="0 0 400 40" preserveAspectRatio="none" className={className} aria-hidden="true">
+      <g ref={trackRef}>
+        <path d={wave} fill="none" stroke="currentColor" strokeWidth="1.5" />
+        <path d={wave} fill="none" stroke="currentColor" strokeWidth="1.5" transform="translate(400,0)" />
+      </g>
+    </svg>
+  );
+}
+
+function FloatingHealthIcons() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced || !containerRef.current) return;
+    const icons = containerRef.current.querySelectorAll<HTMLElement>("[data-float-icon]");
+    icons.forEach((el, i) => {
+      animate(el, {
+        translateY: [0, i % 2 === 0 ? -14 : -9, 0],
+        rotate: [0, i % 2 === 0 ? 6 : -6, 0],
+        duration: 4200 + i * 500,
+        delay: i * 280,
+        loop: true,
+        ease: "inOutSine",
+      });
+    });
+  }, []);
+
+  return (
+    <div ref={containerRef} className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+      <Stethoscope
+        data-float-icon
+        size={64}
+        className="absolute -top-4 -left-6 text-[var(--accent)] opacity-[0.08] rotate-[-12deg]"
+      />
+      <HeartPulse
+        data-float-icon
+        size={48}
+        className="absolute top-1/3 -right-3 text-[var(--color-danger)] opacity-[0.09]"
+      />
+      <Pill
+        data-float-icon
+        size={40}
+        className="absolute bottom-6 left-1/4 text-[var(--color-success)] opacity-[0.08] rotate-[20deg]"
+      />
+    </div>
+  );
+}
+
+function Navbar({ onRequestDemo }: { onRequestDemo: () => void }) {
   const { t, locale, setLocale } = useTranslation();
   const { theme, toggle } = useTheme();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--bg-body)]/80 backdrop-blur-md">
+    <header id="main-nav" className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--bg-body)]/80 backdrop-blur-md">
       <div className="max-w-6xl mx-auto px-4 md:px-6 h-14 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <Logo />
@@ -85,8 +160,8 @@ function Navbar() {
           >
             {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
           </button>
-          <Button asChild size="sm">
-            <Link href="/login">{t("landing.nav_demo")}</Link>
+          <Button size="sm" onClick={onRequestDemo}>
+            {t("landing.nav_demo")}
           </Button>
         </div>
       </div>
@@ -97,7 +172,10 @@ function Navbar() {
 function HeroMock() {
   const { t } = useTranslation();
   return (
-    <div className="relative rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-[var(--shadow)] p-4 sm:p-5">
+    <div
+      data-hero-mock
+      className="relative rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-[var(--shadow)] p-4 sm:p-5"
+    >
       <div className="flex items-center gap-1.5 mb-4">
         <div className="w-2.5 h-2.5 rounded-full bg-[var(--color-danger)]/60" />
         <div className="w-2.5 h-2.5 rounded-full bg-[var(--color-warning)]/60" />
@@ -126,25 +204,27 @@ function HeroMock() {
   );
 }
 
-function Hero() {
+function Hero({ onRequestDemo }: { onRequestDemo: () => void }) {
   const { t } = useTranslation();
   return (
-    <section className="max-w-6xl mx-auto px-4 md:px-6 pt-16 pb-20 md:pt-24 md:pb-28 grid md:grid-cols-2 gap-10 md:gap-8 items-center">
-      <div>
-        <span className="inline-block text-xs font-medium text-[var(--accent)] bg-[var(--accent-dim)] rounded-full px-3 py-1 mb-5">
+    <section className="relative overflow-hidden max-w-6xl mx-auto px-4 md:px-6 pt-16 pb-20 md:pt-24 md:pb-28 grid md:grid-cols-2 gap-10 md:gap-8 items-center">
+      <FloatingHealthIcons />
+      <div className="relative">
+        <span
+          data-hero-badge
+          className="inline-block text-xs font-medium text-[var(--accent)] bg-[var(--accent-dim)] rounded-full px-3 py-1 mb-5"
+        >
           {t("landing.hero_badge")}
         </span>
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-[1.1] mb-5">
+        <h1 data-hero-headline className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-[1.1] mb-5">
           {t("landing.hero_headline")}
         </h1>
-        <p className="text-base sm:text-lg text-[var(--text-secondary)] mb-8 max-w-md">
+        <p data-hero-sub className="text-base sm:text-lg text-[var(--text-secondary)] mb-8 max-w-md">
           {t("landing.hero_subhead")}
         </p>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button asChild size="lg">
-            <Link href="/login">
-              {t("landing.hero_cta_primary")} <ArrowRight size={16} />
-            </Link>
+        <div data-hero-cta className="flex flex-wrap items-center gap-3">
+          <Button size="lg" onClick={onRequestDemo}>
+            {t("landing.hero_cta_primary")} <ArrowRight size={16} />
           </Button>
           <Button asChild size="lg" variant="secondary">
             <a href={FRONTEND_REPO} target="_blank" rel="noopener noreferrer">
@@ -152,10 +232,20 @@ function Hero() {
             </a>
           </Button>
         </div>
-        <p className="mt-4 text-xs text-[var(--text-muted)]">{t("landing.hero_note")}</p>
+        <p data-hero-note className="mt-4 text-xs text-[var(--text-muted)]">
+          {t("landing.hero_note")}
+        </p>
       </div>
       <HeroMock />
     </section>
+  );
+}
+
+function HeartbeatDivider() {
+  return (
+    <div className="relative h-8 overflow-hidden text-[var(--accent)]/30">
+      <HeartbeatLine className="absolute inset-0 w-[200%] h-full" />
+    </div>
   );
 }
 
@@ -163,7 +253,7 @@ function About() {
   const { t } = useTranslation();
   return (
     <section id="stack" className="border-y border-[var(--border)] bg-[var(--bg-surface)]">
-      <div className="max-w-6xl mx-auto px-4 md:px-6 py-14 md:py-20">
+      <div data-reveal className="max-w-6xl mx-auto px-4 md:px-6 py-14 md:py-20">
         <h2 className="text-xl sm:text-2xl font-bold mb-3 max-w-xl">{t("landing.about_title")}</h2>
         <p className="text-sm sm:text-base text-[var(--text-secondary)] mb-6 max-w-2xl">{t("landing.about_body")}</p>
         <div className="flex flex-wrap gap-2 mb-6">
@@ -203,15 +293,16 @@ function Features() {
   const { t } = useTranslation();
   return (
     <section id="features" className="max-w-6xl mx-auto px-4 md:px-6 py-16 md:py-24">
-      <div className="max-w-xl mb-10 md:mb-14">
+      <div data-reveal className="max-w-xl mb-10 md:mb-14">
         <h2 className="text-2xl sm:text-3xl font-bold mb-3">{t("landing.features_title")}</h2>
         <p className="text-[var(--text-secondary)]">{t("landing.features_subtitle")}</p>
       </div>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div data-reveal-group className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {FEATURES.map(({ icon: Icon, titleKey, bodyKey }) => (
           <div
             key={titleKey}
-            className="rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-5 hover:border-[var(--accent)]/40 transition-colors"
+            data-reveal-item
+            className="feature-card rounded-2xl border border-[var(--border)] bg-[var(--bg-surface)] p-5"
           >
             <div className="w-9 h-9 rounded-lg bg-[var(--accent-dim)] flex items-center justify-center mb-3.5">
               <Icon size={17} className="text-[var(--accent)]" />
@@ -235,10 +326,12 @@ function HowItWorks() {
   return (
     <section id="how" className="border-y border-[var(--border)] bg-[var(--bg-surface)]">
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-16 md:py-24">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-10 md:mb-14 max-w-xl">{t("landing.how_title")}</h2>
-        <div className="grid sm:grid-cols-3 gap-8">
+        <h2 data-reveal className="text-2xl sm:text-3xl font-bold mb-10 md:mb-14 max-w-xl">
+          {t("landing.how_title")}
+        </h2>
+        <div data-reveal-group className="grid sm:grid-cols-3 gap-8">
           {steps.map(({ titleKey, bodyKey }, i) => (
-            <div key={titleKey}>
+            <div key={titleKey} data-reveal-item>
               <div className="w-8 h-8 rounded-full bg-[var(--accent)] text-white text-sm font-bold flex items-center justify-center mb-4">
                 {i + 1}
               </div>
@@ -252,33 +345,16 @@ function HowItWorks() {
   );
 }
 
-function CtaFinal() {
+function CtaFinal({ onRequestDemo }: { onRequestDemo: () => void }) {
   const { t } = useTranslation();
   return (
     <section className="max-w-6xl mx-auto px-4 md:px-6 py-16 md:py-24">
-      <div className="rounded-3xl border border-[var(--border)] bg-[var(--bg-surface)] p-8 md:p-12 text-center">
+      <div data-reveal className="rounded-3xl border border-[var(--border)] bg-[var(--bg-surface)] p-8 md:p-12 text-center">
         <h2 className="text-2xl sm:text-3xl font-bold mb-3">{t("landing.cta_title")}</h2>
         <p className="text-[var(--text-secondary)] mb-8 max-w-md mx-auto">{t("landing.cta_body")}</p>
 
-        <div className="flex flex-col sm:flex-row justify-center gap-3 mb-6">
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-hover)] px-4 py-2.5 text-left">
-            <p className="text-[10px] uppercase tracking-wide text-[var(--text-muted)] mb-0.5">
-              {t("landing.cta_admin_label")}
-            </p>
-            <p className="text-sm font-mono">admin / admin123</p>
-          </div>
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-hover)] px-4 py-2.5 text-left">
-            <p className="text-[10px] uppercase tracking-wide text-[var(--text-muted)] mb-0.5">
-              {t("landing.cta_doctor_label")}
-            </p>
-            <p className="text-sm font-mono">doctor / doctor123</p>
-          </div>
-        </div>
-
-        <Button asChild size="lg">
-          <Link href="/login">
-            {t("landing.cta_button")} <ArrowRight size={16} />
-          </Link>
+        <Button size="lg" onClick={onRequestDemo}>
+          {t("landing.cta_button")} <ArrowRight size={16} />
         </Button>
 
         <p className="mt-6 text-xs text-[var(--text-muted)] max-w-md mx-auto">{t("landing.cta_cold_start")}</p>
@@ -297,10 +373,12 @@ function Faq() {
   return (
     <section className="border-t border-[var(--border)]">
       <div className="max-w-3xl mx-auto px-4 md:px-6 py-16 md:py-20">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-8 text-center">{t("landing.faq_title")}</h2>
-        <div className="space-y-4">
+        <h2 data-reveal className="text-2xl sm:text-3xl font-bold mb-8 text-center">
+          {t("landing.faq_title")}
+        </h2>
+        <div data-reveal-group className="space-y-4">
           {items.map(({ q, a }) => (
-            <div key={q} className="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-5">
+            <div key={q} data-reveal-item className="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-5">
               <h3 className="font-semibold text-sm mb-1.5">{t(q)}</h3>
               <p className="text-sm text-[var(--text-secondary)]">{t(a)}</p>
             </div>
@@ -343,18 +421,93 @@ function Footer() {
 }
 
 export function LandingPage() {
+  const [requestOpen, setRequestOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Same as LocaleProvider's mount effect: window.location has no SSR-time
+    // value to derive from, so this can only run after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (window.location.hash === REQUEST_HASH) setRequestOpen(true);
+  }, []);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced || !root) return;
+
+    const animated: Element[] = [];
+    const track = <T extends Element>(el: T | null) => {
+      if (el) animated.push(el);
+      return el;
+    };
+
+    const heroTl = gsap.timeline({ defaults: { ease: "power2.out", duration: 0.5 } });
+    const badge = track(root.querySelector("[data-hero-badge]"));
+    const headline = track(root.querySelector("[data-hero-headline]"));
+    const sub = track(root.querySelector("[data-hero-sub]"));
+    const cta = track(root.querySelector("[data-hero-cta]"));
+    const note = track(root.querySelector("[data-hero-note]"));
+    const mock = track(root.querySelector("[data-hero-mock]"));
+    if (badge) heroTl.from(badge, { opacity: 0, y: 16 });
+    if (headline) heroTl.from(headline, { opacity: 0, y: 16 }, "-=0.35");
+    if (sub) heroTl.from(sub, { opacity: 0, y: 16 }, "-=0.35");
+    if (cta) heroTl.from(cta, { opacity: 0, y: 16 }, "-=0.35");
+    if (note) heroTl.from(note, { opacity: 0 }, "-=0.3");
+    if (mock) heroTl.from(mock, { opacity: 0, x: 24 }, "-=0.6");
+
+    const revealTweens = Array.from(root.querySelectorAll<HTMLElement>("[data-reveal]")).map((el) => {
+      track(el);
+      return gsap.from(el, {
+        opacity: 0,
+        y: 24,
+        duration: 0.5,
+        ease: "power2.out",
+        scrollTrigger: { trigger: el, start: "top 85%" },
+      });
+    });
+
+    const groupTweens = Array.from(root.querySelectorAll<HTMLElement>("[data-reveal-group]")).map((group) => {
+      const items = Array.from(group.querySelectorAll<HTMLElement>("[data-reveal-item]"));
+      items.forEach((item) => track(item));
+      return gsap.from(items, {
+        opacity: 0,
+        y: 20,
+        duration: 0.45,
+        ease: "power2.out",
+        stagger: 0.08,
+        scrollTrigger: { trigger: group, start: "top 85%" },
+      });
+    });
+
+    return () => {
+      heroTl.kill();
+      [...revealTweens, ...groupTweens].forEach((tw) => {
+        tw.scrollTrigger?.kill();
+        tw.kill();
+      });
+      // Strict Mode double-invokes effects in dev — without this, the first
+      // run's cleanup can leave elements stuck at the tween's "from" opacity
+      // (0) if it fires between the from-state being applied and the second
+      // mount's timeline restarting it.
+      gsap.set(animated, { clearProps: "all" });
+    };
+  }, []);
+
   return (
-    <div className="flex flex-col min-h-full">
-      <Navbar />
+    <div ref={rootRef} className="flex flex-col min-h-full">
+      <Navbar onRequestDemo={() => setRequestOpen(true)} />
       <main className="flex-1">
-        <Hero />
+        <Hero onRequestDemo={() => setRequestOpen(true)} />
+        <HeartbeatDivider />
         <About />
         <Features />
         <HowItWorks />
-        <CtaFinal />
+        <CtaFinal onRequestDemo={() => setRequestOpen(true)} />
         <Faq />
       </main>
       <Footer />
+      <RequestDemoDialog open={requestOpen} onOpenChange={setRequestOpen} />
     </div>
   );
 }
