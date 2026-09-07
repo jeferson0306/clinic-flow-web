@@ -43,19 +43,12 @@ export default function LoginPage() {
 
         <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-6 shadow-[var(--shadow)]">
           <form action={formAction} className="flex flex-col gap-4">
-            <Input
-              label={t("auth.username")}
-              name="username"
-              autoComplete="username"
-              placeholder="admin"
-              required
-            />
+            <Input label={t("auth.username")} name="username" autoComplete="username" required />
             <Input
               label={t("auth.password")}
               name="password"
               type="password"
               autoComplete="current-password"
-              placeholder="••••••••"
               required
             />
 
