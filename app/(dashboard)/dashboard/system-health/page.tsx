@@ -3,6 +3,7 @@ import { api } from "@/lib/api";
 import { getSession } from "@/lib/session";
 import { getDictionary } from "@/lib/i18n-server";
 import { RefreshButton } from "@/components/dashboard/system-health/refresh-button";
+import { RecentErrorsTable } from "@/components/dashboard/system-health/recent-errors-table";
 import type { RecentError } from "@/lib/types";
 
 function StatusBadge({ up, label }: { up: boolean; label: string }) {
@@ -17,12 +18,6 @@ function StatusBadge({ up, label }: { up: boolean; label: string }) {
       {label}
     </span>
   );
-}
-
-function statusCodeClass(status: number): string {
-  if (status >= 500) return "text-[var(--color-danger)]";
-  if (status >= 400) return "text-[var(--color-warning)]";
-  return "text-[var(--text-secondary)]";
 }
 
 export default async function SystemHealthPage() {
@@ -76,38 +71,7 @@ export default async function SystemHealthPage() {
         <h2 className="text-sm font-semibold text-[var(--text-primary)] mb-1">{t("system_health.recent_errors")}</h2>
         <p className="text-xs text-[var(--text-muted)] mb-3">{t("system_health.recent_errors_hint")}</p>
 
-        {recentErrors.length === 0 ? (
-          <p className="text-sm text-[var(--text-secondary)] rounded-[10px] border border-[var(--border)] bg-[var(--bg-surface)] p-4">
-            {t("system_health.no_errors")}
-          </p>
-        ) : (
-          <div className="overflow-x-auto rounded-[10px] border border-[var(--border)] bg-[var(--bg-surface)]">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[var(--border)] text-left text-xs text-[var(--text-muted)]">
-                  <th className="px-4 py-2 font-medium">{t("system_health.time")}</th>
-                  <th className="px-4 py-2 font-medium">{t("system_health.status_code")}</th>
-                  <th className="px-4 py-2 font-medium">{t("system_health.exception_type")}</th>
-                  <th className="px-4 py-2 font-medium">{t("system_health.path")}</th>
-                  <th className="px-4 py-2 font-medium">{t("system_health.trace_id")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentErrors.map((e) => (
-                  <tr key={e.traceId} className="border-b border-[var(--border)] last:border-0">
-                    <td className="px-4 py-2 whitespace-nowrap text-[var(--text-secondary)]">
-                      {new Date(e.timestamp).toLocaleString()}
-                    </td>
-                    <td className={`px-4 py-2 font-mono font-medium ${statusCodeClass(e.status)}`}>{e.status}</td>
-                    <td className="px-4 py-2 text-[var(--text-secondary)]">{e.exceptionType}</td>
-                    <td className="px-4 py-2 font-mono text-xs text-[var(--text-secondary)]">{e.path ?? "—"}</td>
-                    <td className="px-4 py-2 font-mono text-xs text-[var(--text-muted)]">{e.traceId}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <RecentErrorsTable errors={recentErrors} />
       </div>
     </main>
   );
