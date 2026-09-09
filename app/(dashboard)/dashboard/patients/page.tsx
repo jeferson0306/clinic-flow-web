@@ -11,10 +11,12 @@ export default async function PatientsPage() {
     getSession(),
     api.patients.list().catch(() => [] as Patient[]),
   ]);
-  // Create/edit/delete are @RolesAllowed("ADMIN") on the backend — a DOCTOR
-  // session hitting one of those would just get a 403, so the controls
-  // don't render for them at all rather than offering an action that fails.
-  const canManage = session?.role === "ADMIN";
+  // Create/update are @RolesAllowed("ADMIN","RECEPCAO") on the backend,
+  // delete stays ADMIN-only — a session hitting a control it lacks the
+  // backend role for would just get a 403, so the controls don't render for
+  // it at all rather than offering an action that fails.
+  const canEdit = session?.role === "ADMIN" || session?.role === "RECEPCAO";
+  const canDelete = session?.role === "ADMIN";
 
   return (
     <main className="p-6">
@@ -23,10 +25,10 @@ export default async function PatientsPage() {
           <h1 className="text-base font-semibold text-[var(--text-primary)] mb-1">{t("patients.title")}</h1>
           <p className="text-sm text-[var(--text-secondary)]">{t("patients.subtitle")}</p>
         </div>
-        {canManage && <NewPatientDialog />}
+        {canEdit && <NewPatientDialog />}
       </div>
 
-      <PatientsTable patients={patients} canManage={canManage} />
+      <PatientsTable patients={patients} canEdit={canEdit} canDelete={canDelete} />
     </main>
   );
 }

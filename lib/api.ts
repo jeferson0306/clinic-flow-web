@@ -132,6 +132,15 @@ export const api = {
   logout: (refreshToken: string) =>
     request<void>("/v1/auth/logout", { method: "POST", body: { refreshToken }, auth: false }),
 
+  // The patient portal's own three reads — no id in any of them, on purpose:
+  // the backend scopes every one to the caller's own patientId JWT claim,
+  // never a value this app could pass. See clinic-flow's MeResource.
+  me: {
+    patient: () => request<Patient>("/v1/me/patient"),
+    appointments: () => request<Appointment[]>("/v1/me/appointments"),
+    exams: () => request<Exam[]>("/v1/me/exams"),
+  },
+
   patients: {
     list: () => request<Patient[]>("/v1/patients"),
     get: (id: string) => request<Patient>(`/v1/patients/${id}`),

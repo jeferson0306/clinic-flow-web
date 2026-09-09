@@ -15,7 +15,15 @@ import type { Patient } from "@/lib/types";
  * column definitions have to be built on the client side that consumes them.
  * `patients` itself is plain, serializable data and crosses that boundary fine.
  */
-export function PatientsTable({ patients, canManage }: { patients: Patient[]; canManage: boolean }) {
+export function PatientsTable({
+  patients,
+  canEdit,
+  canDelete,
+}: {
+  patients: Patient[];
+  canEdit: boolean;
+  canDelete: boolean;
+}) {
   const { t } = useTranslation();
 
   const columns: ColumnDef<Patient>[] = [
@@ -48,15 +56,15 @@ export function PatientsTable({ patients, canManage }: { patients: Patient[]; ca
     },
   ];
 
-  if (canManage) {
+  if (canEdit || canDelete) {
     columns.push({
       id: "actions",
       header: t("common.actions"),
       enableSorting: false,
       cell: ({ row }) => (
         <div className="flex items-center gap-1">
-          <EditPatientDialog patient={row.original} />
-          <DeleteButton id={row.original.id} deleteAction={deletePatient} />
+          {canEdit && <EditPatientDialog patient={row.original} />}
+          {canDelete && <DeleteButton id={row.original.id} deleteAction={deletePatient} />}
         </div>
       ),
     });

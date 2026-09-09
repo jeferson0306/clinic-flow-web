@@ -1,6 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { ACCESS_COOKIE, REFRESH_COOKIE, cookieOptions } from "@/lib/session-constants";
+import type { Role } from "@/lib/types";
 
 /**
  * The JWT lives only in an httpOnly cookie — never in localStorage, never
@@ -11,15 +12,15 @@ import { ACCESS_COOKIE, REFRESH_COOKIE, cookieOptions } from "@/lib/session-cons
  *
  * The access token is short-lived (see AuthService.TOKEN_LIFETIME) and the
  * refresh token — a separate httpOnly cookie, never exposed in `Session` —
- * is what middleware.ts uses to silently renew it before it expires,
- * without asking for a password again.
+ * is what proxy.ts (Next's middleware) uses to silently renew it before it
+ * expires, without asking for a password again.
  */
-export type Session = { token: string; role: "ADMIN" | "DOCTOR"; email: string; expiresAt: number };
+export type Session = { token: string; role: Role; email: string; expiresAt: number };
 
 export async function setSession(session: {
   token: string;
   expiresInSeconds: number;
-  role: "ADMIN" | "DOCTOR";
+  role: Role;
   email: string;
   refreshToken: string;
   refreshExpiresInSeconds: number;

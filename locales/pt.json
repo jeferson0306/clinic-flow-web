@@ -286,5 +286,21 @@
     "request_toast": "A abrir o teu cliente de email...",
     "mock_appointments": "Consultas",
     "nav_login": "Entrar"
+  },
+  "portal": {
+    "title": "Portal do paciente",
+    "nav_home": "Início",
+    "nav_appointments": "Consultas",
+    "nav_settings": "Definições",
+    "welcome": "Bem-vindo",
+    "next_appointment_title": "Próxima consulta",
+    "next_appointment_empty": "Nenhuma consulta agendada.",
+    "upcoming_section_title": "Próximas consultas",
+    "recent_exams_title": "Exames recentes",
+    "recent_exams_empty": "Nenhum exame registado.",
+    "appointments_title": "As minhas consultas",
+    "appointments_subtitle": "Histórico completo, mais recentes primeiro.",
+    "appointments_empty": "Nenhuma consulta encontrada.",
+    "with_doctor": "Com"
   }
 }

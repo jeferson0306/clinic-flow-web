@@ -1,6 +1,6 @@
 /** Mirrors the backend's own DTOs exactly — see clinic-flow's *Response/*Request records. */
 
-export type Role = "ADMIN" | "DOCTOR";
+export type Role = "ADMIN" | "DOCTOR" | "RECEPCAO" | "PACIENTE";
 
 export type ErrorCategory = "VALIDATION" | "CONFLICT" | "NOT_FOUND" | "RATE_LIMITED" | "UNAUTHORIZED" | "SYSTEM";
 

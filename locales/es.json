@@ -286,5 +286,21 @@
     "request_toast": "Abriendo tu cliente de correo...",
     "mock_appointments": "Citas",
     "nav_login": "Entrar"
+  },
+  "portal": {
+    "title": "Portal del paciente",
+    "nav_home": "Inicio",
+    "nav_appointments": "Citas",
+    "nav_settings": "Ajustes",
+    "welcome": "Bienvenido",
+    "next_appointment_title": "Próxima cita",
+    "next_appointment_empty": "Ninguna cita agendada.",
+    "upcoming_section_title": "Próximas citas",
+    "recent_exams_title": "Exámenes recientes",
+    "recent_exams_empty": "Ningún examen registrado.",
+    "appointments_title": "Mis citas",
+    "appointments_subtitle": "Historial completo, más recientes primero.",
+    "appointments_empty": "No se encontraron citas.",
+    "with_doctor": "Con"
   }
 }

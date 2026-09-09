@@ -286,5 +286,21 @@
     "request_toast": "Opening your email client...",
     "mock_appointments": "Appointments",
     "nav_login": "Log in"
+  },
+  "portal": {
+    "title": "Patient portal",
+    "nav_home": "Home",
+    "nav_appointments": "Appointments",
+    "nav_settings": "Settings",
+    "welcome": "Welcome",
+    "next_appointment_title": "Next appointment",
+    "next_appointment_empty": "No appointment scheduled.",
+    "upcoming_section_title": "Upcoming appointments",
+    "recent_exams_title": "Recent exams",
+    "recent_exams_empty": "No exams on record.",
+    "appointments_title": "My appointments",
+    "appointments_subtitle": "Full history, newest first.",
+    "appointments_empty": "No appointments found.",
+    "with_doctor": "With"
   }
 }

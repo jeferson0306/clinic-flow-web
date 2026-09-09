@@ -1,17 +1,20 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { ACCESS_COOKIE, REFRESH_COOKIE, REFRESH_SKEW_MS, cookieOptions } from "@/lib/session-constants";
 import type { Session } from "@/lib/session";
+import type { Role } from "@/lib/types";
 
 const API_URL = process.env.CLINIC_FLOW_API_URL || "http://localhost:8080";
 
 /**
  * Two jobs, in one file because Next only runs one of these per request:
  *
- * 1. Gates /dashboard behind the httpOnly session cookie's mere presence —
- *    a cheap, non-cryptographic check. Every route handler and Server
+ * 1. Gates /dashboard and /portal behind the httpOnly session cookie's mere
+ *    presence, and behind which of the two a PACIENTE vs. a staff role gets
+ *    — a cheap, non-cryptographic check. Every route handler and Server
  *    Action still calls lib/api.ts, which sends the actual JWT to the
  *    backend and lets @RolesAllowed enforce the real authorization; this is
- *    UX, not the security boundary.
+ *    UX, not the security boundary — a patient token could not read
+ *    /dashboard's data even if this redirect were skipped entirely.
  * 2. Silently renews the access token before it expires, using the refresh
  *    token — this is the one place that runs on every dashboard request
  *    regardless of which page it is, so it is the right spot for this
@@ -28,25 +31,27 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   let hasSession = request.cookies.has(ACCESS_COOKIE);
+  let role: Role | null = null;
   let refreshedAccess: { value: string; maxAgeSeconds: number } | null = null;
   let refreshedRefresh: { value: string; maxAgeSeconds: number } | null = null;
   let refreshTokenIsDead = false;
 
+  const accessRaw = request.cookies.get(ACCESS_COOKIE)?.value;
+  let expiresAt: number | null = null;
+  let existingEmail = "";
+  if (accessRaw) {
+    try {
+      const parsed = JSON.parse(accessRaw) as Session;
+      expiresAt = parsed.expiresAt;
+      existingEmail = parsed.email;
+      role = parsed.role;
+    } catch {
+      // Malformed cookie — treated the same as a missing one below: needs a refresh.
+    }
+  }
+
   const refreshToken = request.cookies.get(REFRESH_COOKIE)?.value;
   if (refreshToken) {
-    const accessRaw = request.cookies.get(ACCESS_COOKIE)?.value;
-    let expiresAt: number | null = null;
-    let existingEmail = "";
-    if (accessRaw) {
-      try {
-        const parsed = JSON.parse(accessRaw) as Session;
-        expiresAt = parsed.expiresAt;
-        existingEmail = parsed.email;
-      } catch {
-        // Malformed cookie — treated the same as a missing one below: needs a refresh.
-      }
-    }
-
     const needsRefresh = !accessRaw || expiresAt === null || expiresAt - Date.now() < REFRESH_SKEW_MS;
     if (needsRefresh) {
       try {
@@ -61,7 +66,7 @@ export async function proxy(request: NextRequest) {
           const data = (await res.json()) as {
             token: string;
             expiresInSeconds: number;
-            role: "ADMIN" | "DOCTOR";
+            role: Role;
             refreshToken: string;
             refreshExpiresInSeconds: number;
           };
@@ -74,6 +79,7 @@ export async function proxy(request: NextRequest) {
           refreshedAccess = { value: JSON.stringify(session), maxAgeSeconds: data.expiresInSeconds };
           refreshedRefresh = { value: data.refreshToken, maxAgeSeconds: data.refreshExpiresInSeconds };
           hasSession = true;
+          role = data.role;
         } else {
           // The refresh token is dead too (expired, revoked, or reused) —
           // clear both cookies below so this behaves exactly like no
@@ -81,6 +87,7 @@ export async function proxy(request: NextRequest) {
           // that would still look "logged in" but 401 on every real request.
           refreshTokenIsDead = true;
           hasSession = false;
+          role = null;
         }
       } catch {
         // Backend unreachable — proceed with whatever the request already
@@ -91,13 +98,23 @@ export async function proxy(request: NextRequest) {
     }
   }
 
+  const isPatientPortal = pathname.startsWith("/portal");
+  const isStaffArea = pathname.startsWith("/dashboard");
+  const homeFor = (r: Role) => (r === "PACIENTE" ? "/portal" : "/dashboard");
+
   let response: NextResponse;
-  if (pathname.startsWith("/dashboard") && !hasSession) {
+  if ((isStaffArea || isPatientPortal) && !hasSession) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", pathname);
     response = NextResponse.redirect(loginUrl);
-  } else if (pathname === "/login" && hasSession) {
+  } else if (isStaffArea && role === "PACIENTE") {
+    // A patient token reaching /dashboard: not just blocked, sent to the
+    // area that's actually theirs — same as a signed-in user hitting /login.
+    response = NextResponse.redirect(new URL("/portal", request.url));
+  } else if (isPatientPortal && role !== null && role !== "PACIENTE") {
     response = NextResponse.redirect(new URL("/dashboard", request.url));
+  } else if (pathname === "/login" && hasSession && role !== null) {
+    response = NextResponse.redirect(new URL(homeFor(role), request.url));
   } else {
     response = NextResponse.next();
   }
@@ -113,5 +130,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login"],
+  matcher: ["/dashboard/:path*", "/portal/:path*", "/login"],
 };

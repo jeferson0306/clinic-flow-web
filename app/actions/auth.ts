@@ -14,6 +14,8 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
     return { error: "missing_fields" };
   }
 
+  let destination = "/dashboard";
+
   try {
     const response = await api.login(email, password);
     await setSession({
@@ -24,6 +26,7 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
       refreshToken: response.refreshToken,
       refreshExpiresInSeconds: response.refreshExpiresInSeconds,
     });
+    if (response.role === "PACIENTE") destination = "/portal";
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
       return { error: "invalid_credentials" };
@@ -31,7 +34,7 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
     return { error: "unknown" };
   }
 
-  redirect("/dashboard");
+  redirect(destination);
 }
 
 export async function logout(): Promise<void> {
