@@ -148,7 +148,9 @@
     "patients_total": "Registered patients",
     "doctors_total": "Active doctors",
     "procedures_total": "Procedures in catalogue",
-    "quick_actions": "Quick actions"
+    "quick_actions": "Quick actions",
+    "appointments_chart_title": "Appointments — last 7 and next 7 days",
+    "appointments_chart_empty": "No appointments in this period."
   },
   "validation": {
     "invalid_name": "Invalid name: letters and spaces only (3-120 characters).",

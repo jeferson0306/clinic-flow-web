@@ -148,7 +148,9 @@
     "patients_total": "Pacientes registrados",
     "doctors_total": "Médicos activos",
     "procedures_total": "Procedimientos en catálogo",
-    "quick_actions": "Acciones rápidas"
+    "quick_actions": "Acciones rápidas",
+    "appointments_chart_title": "Citas — ultimos 7 y proximos 7 dias",
+    "appointments_chart_empty": "Sin citas en este periodo."
   },
   "validation": {
     "invalid_name": "Nombre inválido: solo letras y espacios (3-120 caracteres).",

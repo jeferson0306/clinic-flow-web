@@ -3,15 +3,38 @@ import { CalendarClock, ClipboardList, Stethoscope, Users } from "lucide-react";
 import { api } from "@/lib/api";
 import { getSession } from "@/lib/session";
 import { AnimatedStats } from "@/components/dashboard/animated-stats";
+import { AppointmentsChart, type DayCount } from "@/components/dashboard/appointments-chart";
 import { getDictionary } from "@/lib/i18n-server";
+import type { Appointment } from "@/lib/types";
+
+function appointmentsByDay(appointments: Appointment[]): DayCount[] {
+  const counts = new Map<string, number>();
+  for (const a of appointments) {
+    if (a.status !== "SCHEDULED") continue;
+    const date = a.startsAt.slice(0, 10);
+    counts.set(date, (counts.get(date) ?? 0) + 1);
+  }
+
+  const days: DayCount[] = [];
+  const start = new Date();
+  start.setDate(start.getDate() - 6);
+  for (let i = 0; i < 14; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    const iso = d.toISOString().slice(0, 10);
+    days.push({ date: iso, count: counts.get(iso) ?? 0 });
+  }
+  return days;
+}
 
 export default async function DashboardPage() {
   const [session, t] = await Promise.all([getSession(), getDictionary()]);
 
-  const [patients, doctors, procedures] = await Promise.all([
+  const [patients, doctors, procedures, appointments] = await Promise.all([
     api.patients.list().catch(() => []),
     api.doctors.list().catch(() => []),
     api.procedures.list().catch(() => []),
+    api.appointments.list().catch(() => [] as Appointment[]),
   ]);
 
   const stats = [
@@ -36,6 +59,14 @@ export default async function DashboardPage() {
 
       <div className="mt-6">
         <AnimatedStats stats={stats} />
+      </div>
+
+      <div className="mt-6">
+        <AppointmentsChart
+          data={appointmentsByDay(appointments)}
+          title={t("dashboard.appointments_chart_title")}
+          emptyLabel={t("dashboard.appointments_chart_empty")}
+        />
       </div>
 
       <div className="mt-8">
