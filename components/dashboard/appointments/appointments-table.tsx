@@ -36,7 +36,10 @@ export function AppointmentsTable({
       id: "startsAt",
       header: t("appointments.date"),
       accessorFn: (a) => a.startsAt,
-      cell: (info) => formatDatetime(info.getValue<string>()),
+      // suppressHydrationWarning: formatDatetime resolves to the browser's
+      // locale/timezone, which differs from the server's during SSR — an
+      // expected, one-time mismatch corrected on hydration, not a real bug.
+      cell: (info) => <span suppressHydrationWarning>{formatDatetime(info.getValue<string>())}</span>,
     },
     {
       id: "status",

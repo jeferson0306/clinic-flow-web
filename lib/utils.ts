@@ -9,11 +9,16 @@ export function formatCurrency(value: number, currency = 'BRL', locale = 'pt-BR'
   return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(value)
 }
 
-export function formatDate(date: string | Date, locale = 'pt-BR'): string {
+// `locale` defaults to undefined, not a hardcoded tag — Intl.DateTimeFormat
+// then falls back to the browser's own locale, so a visitor in Lisbon sees
+// dd/mm/yyyy and one in the US sees mm/dd/yyyy, each in their own timezone,
+// without this app guessing which. Pass an explicit locale only when a
+// caller genuinely needs one specific format regardless of the viewer.
+export function formatDate(date: string | Date, locale?: string): string {
   return new Intl.DateTimeFormat(locale, { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(date))
 }
 
-export function formatDatetime(date: string | Date, locale = 'pt-BR'): string {
+export function formatDatetime(date: string | Date, locale?: string): string {
   return new Intl.DateTimeFormat(locale, {
     day: '2-digit', month: '2-digit', year: 'numeric',
     hour: '2-digit', minute: '2-digit',

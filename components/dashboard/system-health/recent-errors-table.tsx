@@ -25,9 +25,13 @@ export function RecentErrorsTable({ errors }: { errors: RecentError[] }) {
       id: "timestamp",
       header: t("system_health.time"),
       // Sort by the raw ISO string (correct lexicographically) while
-      // displaying it formatted for the viewer's locale.
+      // displaying it formatted for the viewer's locale. suppressHydrationWarning:
+      // that locale/timezone differs from the server's during SSR — an
+      // expected, one-time mismatch corrected on hydration, not a real bug.
       accessorFn: (e) => e.timestamp,
-      cell: ({ row }) => new Date(row.original.timestamp).toLocaleString(),
+      cell: ({ row }) => (
+        <span suppressHydrationWarning>{new Date(row.original.timestamp).toLocaleString()}</span>
+      ),
     },
     {
       id: "status",

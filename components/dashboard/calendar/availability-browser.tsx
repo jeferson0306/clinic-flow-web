@@ -11,8 +11,12 @@ function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+// No locale argument: Intl.DateTimeFormat falls back to the browser's own
+// locale (and, for hour/minute, its 12h/24h convention) — the visitor's
+// actual timezone and format preference, not a hardcoded one that only
+// happens to match the author's.
 function formatTime(iso: string): string {
-  return new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+  return new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 }
 
 export function AvailabilityBrowser({ doctors, procedures }: { doctors: Doctor[]; procedures: Procedure[] }) {

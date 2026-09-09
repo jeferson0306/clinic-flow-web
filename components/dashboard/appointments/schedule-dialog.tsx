@@ -12,8 +12,9 @@ import { useAvailability } from "@/lib/hooks/use-availability";
 import { useTranslation } from "@/lib/i18n";
 import type { Doctor, Patient, Procedure } from "@/lib/types";
 
+// No locale argument: falls back to the browser's own locale/timezone.
 function formatTime(iso: string): string {
-  return new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+  return new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
 }
 
 function SubmitButton({ disabled }: { disabled: boolean }) {

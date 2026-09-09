@@ -33,7 +33,10 @@ export function ExamsTable({
       id: "requestedAt",
       header: t("exams.requested_at"),
       accessorFn: (e) => e.requestedAt,
-      cell: (info) => formatDatetime(info.getValue<string>()),
+      // suppressHydrationWarning: formatDatetime resolves to the browser's
+      // locale/timezone, which differs from the server's during SSR — an
+      // expected, one-time mismatch corrected on hydration, not a real bug.
+      cell: (info) => <span suppressHydrationWarning>{formatDatetime(info.getValue<string>())}</span>,
     },
     { id: "result", header: t("exams.result"), accessorFn: (e) => e.result ?? t("exams.no_result") },
     {
