@@ -239,6 +239,7 @@
     "request_email": "Correo electrónico",
     "request_message": "Mensaje (opcional)",
     "request_submit": "Abrir correo",
-    "request_toast": "Abriendo tu cliente de correo..."
+    "request_toast": "Abriendo tu cliente de correo...",
+    "mock_appointments": "Citas"
   }
 }

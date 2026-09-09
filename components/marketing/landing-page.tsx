@@ -196,7 +196,17 @@ function HeroMock() {
           </div>
         </div>
       ))}
-      <div className="mt-4 flex items-center gap-2 rounded-lg bg-[var(--color-success)]/10 px-3 py-2">
+      <div className="mt-4 pt-3 border-t border-[var(--border)]">
+        <span className="text-[10px] font-semibold uppercase tracking-widest text-[var(--text-muted)]">
+          {t("landing.mock_appointments")}
+        </span>
+        <div className="mt-2 flex items-end gap-1 h-10">
+          {[40, 65, 30, 90, 55, 75, 45].map((h, i) => (
+            <div key={i} className="flex-1 rounded-t bg-[var(--accent)]" style={{ height: `${h}%`, opacity: 0.5 + h / 200 }} />
+          ))}
+        </div>
+      </div>
+      <div className="mt-3 flex items-center gap-2 rounded-lg bg-[var(--color-success)]/10 px-3 py-2">
         <CalendarClock size={14} className="text-[var(--color-success)] shrink-0" />
         <span className="text-[11px] text-[var(--color-success)]">{t("landing.mock_no_conflict")}</span>
       </div>

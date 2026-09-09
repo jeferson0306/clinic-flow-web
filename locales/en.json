@@ -239,6 +239,7 @@
     "request_email": "Email",
     "request_message": "Message (optional)",
     "request_submit": "Open email",
-    "request_toast": "Opening your email client..."
+    "request_toast": "Opening your email client...",
+    "mock_appointments": "Appointments"
   }
 }
