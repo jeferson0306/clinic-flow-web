@@ -116,6 +116,26 @@ function FloatingHealthIcons() {
   );
 }
 
+/**
+ * A native `<a href="#id">` jump was the one thing that reliably broke the
+ * sticky header on "Como funciona" (reported live, twice) — CSS hardening
+ * (translateZ, scroll-mt) alone never fixed it, which points at the jump
+ * itself, not the header's own styling: a native anchor jump moves the
+ * viewport in a single frame with no intermediate scroll events, and this
+ * page's several GSAP ScrollTrigger instances (the reveal animations, the
+ * heartbeat line) never get a chance to recompute against the new
+ * position — one of them ends up pinned at a stale offset that can overlap
+ * the header. `scrollIntoView({ behavior: "smooth" })` produces real
+ * intermediate scroll events the whole way, and `ScrollTrigger.refresh()`
+ * after it settles forces every instance to recompute regardless.
+ */
+function scrollToSection(id: string) {
+  const target = document.getElementById(id);
+  if (!target) return;
+  target.scrollIntoView({ behavior: "smooth", block: "start" });
+  window.setTimeout(() => ScrollTrigger.refresh(), 600);
+}
+
 function Navbar({ onRequestDemo }: { onRequestDemo: () => void }) {
   const { t, locale, setLocale } = useTranslation();
   const { theme, toggle } = useTheme();
@@ -137,13 +157,34 @@ function Navbar({ onRequestDemo }: { onRequestDemo: () => void }) {
         </div>
 
         <nav className="hidden md:flex items-center gap-6 text-sm text-[var(--text-secondary)]">
-          <a href="#features" className="hover:text-[var(--text-primary)] transition-colors">
+          <a
+            href="#features"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection("features");
+            }}
+            className="hover:text-[var(--text-primary)] transition-colors"
+          >
             {t("landing.nav_features")}
           </a>
-          <a href="#how" className="hover:text-[var(--text-primary)] transition-colors">
+          <a
+            href="#how"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection("how");
+            }}
+            className="hover:text-[var(--text-primary)] transition-colors"
+          >
             {t("landing.nav_how")}
           </a>
-          <a href="#stack" className="hover:text-[var(--text-primary)] transition-colors">
+          <a
+            href="#stack"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection("stack");
+            }}
+            className="hover:text-[var(--text-primary)] transition-colors"
+          >
             {t("landing.nav_stack")}
           </a>
         </nav>

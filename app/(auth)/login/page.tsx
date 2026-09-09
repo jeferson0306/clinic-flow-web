@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { login, type LoginState } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +38,15 @@ export default function LoginPage() {
     <div className="min-h-dvh flex items-center justify-center bg-[var(--bg-body)] px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 mb-6 text-sm font-bold text-[var(--text-primary)] hover:opacity-80 transition-opacity"
+          >
+            <span className="w-6 h-6 rounded-md bg-[var(--accent)] flex items-center justify-center shrink-0">
+              <Plus size={13} className="text-white" strokeWidth={3} />
+            </span>
+            {t("app.name")}
+          </Link>
           <h1 className="text-xl font-bold text-[var(--text-primary)]">{t("auth.welcome_back")}</h1>
           <p className="mt-1 text-sm text-[var(--text-secondary)]">{t("auth.sign_in_subtitle")}</p>
         </div>

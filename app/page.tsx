@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 export default async function RootPage() {
   const session = await getSession();
-  if (session) redirect("/dashboard");
+  if (session) redirect(session.role === "PACIENTE" ? "/portal" : "/dashboard");
 
   return <LandingPage />;
 }
