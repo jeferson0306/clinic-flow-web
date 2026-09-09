@@ -89,7 +89,13 @@ export type Availability = {
   freeSlots: TimeSlot[];
 };
 
-export type LoginResponse = { token: string; expiresInSeconds: number; role: Role };
+export type LoginResponse = {
+  token: string;
+  expiresInSeconds: number;
+  role: Role;
+  refreshToken: string;
+  refreshExpiresInSeconds: number;
+};
 
 export type HealthCheckStatus = "UP" | "DOWN";
 

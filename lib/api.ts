@@ -126,6 +126,12 @@ export const api = {
   changePassword: (currentPassword: string, newPassword: string) =>
     request<void>("/v1/auth/password", { method: "PUT", body: { currentPassword, newPassword } }),
 
+  refresh: (refreshToken: string) =>
+    request<LoginResponse>("/v1/auth/refresh", { method: "POST", body: { refreshToken }, auth: false }),
+
+  logout: (refreshToken: string) =>
+    request<void>("/v1/auth/logout", { method: "POST", body: { refreshToken }, auth: false }),
+
   patients: {
     list: () => request<Patient[]>("/v1/patients"),
     get: (id: string) => request<Patient>(`/v1/patients/${id}`),

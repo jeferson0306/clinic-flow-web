@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { api, ApiError } from "@/lib/api";
-import { clearSession, setSession } from "@/lib/session";
+import { clearSession, getRefreshToken, setSession } from "@/lib/session";
 
 export type LoginState = { error: string | null };
 
@@ -16,7 +16,14 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
 
   try {
     const response = await api.login(email, password);
-    await setSession({ token: response.token, role: response.role, email: response.email });
+    await setSession({
+      token: response.token,
+      expiresInSeconds: response.expiresInSeconds,
+      role: response.role,
+      email: response.email,
+      refreshToken: response.refreshToken,
+      refreshExpiresInSeconds: response.refreshExpiresInSeconds,
+    });
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
       return { error: "invalid_credentials" };
@@ -28,6 +35,14 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
 }
 
 export async function logout(): Promise<void> {
+  const refreshToken = await getRefreshToken();
+  if (refreshToken) {
+    // Best-effort: revoking server-side is what actually ends the session
+    // (a stolen refresh token stops working), but a signed-out browser
+    // should never get stuck on a slow/unreachable backend — the cookies
+    // are cleared either way.
+    await api.logout(refreshToken).catch(() => {});
+  }
   await clearSession();
   redirect("/login");
 }
