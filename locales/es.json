@@ -157,7 +157,17 @@
     "procedures_total": "Procedimientos en catálogo",
     "quick_actions": "Acciones rápidas",
     "appointments_chart_title": "Citas — ultimos 7 y proximos 7 dias",
-    "appointments_chart_empty": "Sin citas en este periodo."
+    "appointments_chart_empty": "Sin citas en este periodo.",
+    "greeting_morning": "Buenos días",
+    "greeting_afternoon": "Buenas tardes",
+    "greeting_evening": "Buenas noches",
+    "next_appointment_title": "Próxima cita",
+    "next_appointment_empty": "Ninguna cita agendada.",
+    "next_appointment_today": "Hoy",
+    "next_appointment_upcoming": "Próximamente",
+    "specialty_breakdown_title": "Médicos por especialidad",
+    "specialty_breakdown_empty": "Sin médicos registrados.",
+    "specialty_other": "Otras"
   },
   "validation": {
     "invalid_name": "Nombre inválido: solo letras y espacios (3-120 caracteres).",

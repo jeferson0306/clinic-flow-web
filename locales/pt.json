@@ -157,7 +157,17 @@
     "procedures_total": "Procedimentos no catálogo",
     "quick_actions": "Ações rápidas",
     "appointments_chart_title": "Consultas — ultimos 7 e proximos 7 dias",
-    "appointments_chart_empty": "Sem consultas neste periodo."
+    "appointments_chart_empty": "Sem consultas neste periodo.",
+    "greeting_morning": "Bom dia",
+    "greeting_afternoon": "Boa tarde",
+    "greeting_evening": "Boa noite",
+    "next_appointment_title": "Próxima consulta",
+    "next_appointment_empty": "Nenhuma consulta agendada.",
+    "next_appointment_today": "Hoje",
+    "next_appointment_upcoming": "Em breve",
+    "specialty_breakdown_title": "Médicos por especialidade",
+    "specialty_breakdown_empty": "Sem médicos registados.",
+    "specialty_other": "Outras"
   },
   "validation": {
     "invalid_name": "Nome inválido: use apenas letras e espaços (3-120 caracteres).",

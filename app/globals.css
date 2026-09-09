@@ -135,3 +135,24 @@ html.light ::-webkit-scrollbar-thumb:hover {
     transform: none;
   }
 }
+
+/* ── Dashboard home ───────────────────────────────────────────── */
+@keyframes pulseDot {
+  0%, 100% {
+    opacity: 0.75;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.25;
+    transform: scale(1.6);
+  }
+}
+.pulse-dot {
+  animation: pulseDot 2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-dot {
+    animation: none;
+  }
+}

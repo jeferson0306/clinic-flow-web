@@ -157,7 +157,17 @@
     "procedures_total": "Procedures in catalogue",
     "quick_actions": "Quick actions",
     "appointments_chart_title": "Appointments — last 7 and next 7 days",
-    "appointments_chart_empty": "No appointments in this period."
+    "appointments_chart_empty": "No appointments in this period.",
+    "greeting_morning": "Good morning",
+    "greeting_afternoon": "Good afternoon",
+    "greeting_evening": "Good evening",
+    "next_appointment_title": "Next appointment",
+    "next_appointment_empty": "No appointment scheduled.",
+    "next_appointment_today": "Today",
+    "next_appointment_upcoming": "Coming up",
+    "specialty_breakdown_title": "Doctors by specialty",
+    "specialty_breakdown_empty": "No doctors registered.",
+    "specialty_other": "Other"
   },
   "validation": {
     "invalid_name": "Invalid name: letters and spaces only (3-120 characters).",
