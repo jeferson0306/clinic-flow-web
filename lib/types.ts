@@ -10,7 +10,14 @@ export type Address = {
   district: string | null;
   city: string | null;
   state: string | null;
+  ibgeCode: string | null;
 };
+
+export type Sex = "MASCULINO" | "FEMININO" | "OUTRO" | "NAO_INFORMADO";
+
+export type BloodType = "A_POS" | "A_NEG" | "B_POS" | "B_NEG" | "AB_POS" | "AB_NEG" | "O_POS" | "O_NEG";
+
+export type GuardianRelationship = "MAE" | "PAI" | "TUTOR" | "OUTRO";
 
 export type Patient = {
   id: string;
@@ -21,6 +28,18 @@ export type Patient = {
   birthDate: string | null;
   address: Address;
   createdAt: string;
+  socialName: string | null;
+  motherName: string | null;
+  sex: Sex | null;
+  bloodType: BloodType | null;
+  allergies: string | null;
+  continuousMedications: string | null;
+  preExistingConditions: string | null;
+  clinicalAlert: string | null;
+  guardianName: string | null;
+  maskedGuardianCpf: string | null;
+  guardianRelationship: GuardianRelationship | null;
+  guardianPhone: string | null;
 };
 
 export type Doctor = {

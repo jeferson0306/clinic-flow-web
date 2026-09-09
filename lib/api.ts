@@ -3,16 +3,35 @@ import { getSession } from "@/lib/session";
 import type {
   Appointment,
   Availability,
+  BloodType,
   Doctor,
   Exam,
+  GuardianRelationship,
   HealthReport,
   LoginResponse,
   Patient,
   Procedure,
   RecentError,
+  Sex,
 } from "@/lib/types";
 
 const API_URL = process.env.CLINIC_FLOW_API_URL || "http://localhost:8080";
+
+/** The optional clinical/legal-guardian fields both create and update share. */
+type PatientClinicalFields = {
+  socialName?: string;
+  motherName?: string;
+  sex?: Sex;
+  bloodType?: BloodType;
+  allergies?: string;
+  continuousMedications?: string;
+  preExistingConditions?: string;
+  clinicalAlert?: string;
+  guardianName?: string;
+  guardianCpf?: string;
+  guardianRelationship?: GuardianRelationship;
+  guardianPhone?: string;
+};
 
 export type ApiErrorBody = {
   field: string | null;
@@ -110,17 +129,20 @@ export const api = {
   patients: {
     list: () => request<Patient[]>("/v1/patients"),
     get: (id: string) => request<Patient>(`/v1/patients/${id}`),
-    create: (data: {
-      fullName: string;
-      cpf: string;
-      email: string;
-      phone?: string;
-      birthDate?: string;
-      postcode: string;
-    }) => request<Patient>("/v1/patients", { method: "POST", body: data }),
+    create: (
+      data: {
+        fullName: string;
+        cpf: string;
+        email: string;
+        phone?: string;
+        birthDate?: string;
+        postcode: string;
+      } & PatientClinicalFields,
+    ) => request<Patient>("/v1/patients", { method: "POST", body: data }),
     update: (
       id: string,
-      data: { fullName: string; email: string; phone?: string; birthDate?: string; postcode: string },
+      data: { fullName: string; email: string; phone?: string; birthDate?: string; postcode: string } &
+        PatientClinicalFields,
     ) => request<Patient>(`/v1/patients/${id}`, { method: "PUT", body: data }),
     delete: (id: string) => request<void>(`/v1/patients/${id}`, { method: "DELETE" }),
   },

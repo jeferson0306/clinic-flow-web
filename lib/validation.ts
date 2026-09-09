@@ -113,6 +113,22 @@ export function isValidOptionalBirthDate(value: string): boolean {
 }
 
 /**
+ * Mirrors the backend's RequiresGuardianIfMinor: an empty birthDate means
+ * age is unknown, not "assume a minor" — same lenient stance as everywhere
+ * else this field is optional.
+ */
+export function isMinor(birthDate: string): boolean {
+  if (!birthDate || !/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) return false;
+  const today = new Date();
+  const birth = new Date(birthDate);
+  let age = today.getFullYear() - birth.getFullYear();
+  const hasHadBirthdayThisYear =
+    today.getMonth() > birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() >= birth.getDate());
+  if (!hasHadBirthdayThisYear) age -= 1;
+  return age < 18;
+}
+
+/**
  * The backend already sends a specific, human-readable reason (brdoc's own
  * message, or a Bean Validation one) in `fieldErrors` — prefer that in a
  * toast over a generic "something went wrong", which told the user nothing

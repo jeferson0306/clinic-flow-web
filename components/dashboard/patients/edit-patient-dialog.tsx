@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import { updatePatient } from "@/app/actions/patients";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SelectField } from "@/components/ui/select-field";
+import { TextAreaField } from "@/components/ui/textarea-field";
 import { Dialog } from "@/components/ui/dialog";
 import { useTranslation } from "@/lib/i18n";
 import type { Patient } from "@/lib/types";
@@ -18,6 +20,8 @@ import {
   isValidName,
   isValidOptionalBirthDate,
   isValidOptionalPhone,
+  isMinor,
+  maskCpf,
   maskPhone,
   maskPostcode,
   sanitizeName,
@@ -41,6 +45,21 @@ function formFromPatient(patient: Patient) {
     phone: patient.phone ?? "",
     birthDate: patient.birthDate ?? "",
     postcode: patient.address.postcode,
+    socialName: patient.socialName ?? "",
+    motherName: patient.motherName ?? "",
+    sex: patient.sex ?? "",
+    bloodType: patient.bloodType ?? "",
+    allergies: patient.allergies ?? "",
+    continuousMedications: patient.continuousMedications ?? "",
+    preExistingConditions: patient.preExistingConditions ?? "",
+    clinicalAlert: patient.clinicalAlert ?? "",
+    guardianName: patient.guardianName ?? "",
+    // Never prefilled — the backend only ever returns it masked, so there is
+    // no valid CPF value to round-trip here. Left blank means "keep the one
+    // on file" (see PatientService.update).
+    guardianCpf: "",
+    guardianRelationship: patient.guardianRelationship ?? "",
+    guardianPhone: patient.guardianPhone ?? "",
   };
 }
 
@@ -84,6 +103,16 @@ export function EditPatientDialog({ patient }: { patient: Patient }) {
           if (!isValidOptionalPhone(form.phone)) errors.phone = t("validation.invalid_phone");
           if (!isValidOptionalBirthDate(form.birthDate)) errors.birthDate = t("validation.invalid_birth_date");
           if (!isCompletePostcode(form.postcode)) errors.postcode = t("validation.invalid_postcode");
+          // guardianCpf is exempt when a masked one is already on file — an
+          // untouched (blank) field there means "keep it," not "missing."
+          if (
+            isMinor(form.birthDate) &&
+            (!form.guardianName.trim() ||
+              !form.guardianRelationship ||
+              (!form.guardianCpf.trim() && !patient.maskedGuardianCpf))
+          ) {
+            errors.guardianName = t("patients.guardian_section_hint");
+          }
           if (Object.keys(errors).length > 0) {
             setFieldErrors(errors);
             return;
@@ -151,6 +180,127 @@ export function EditPatientDialog({ patient }: { patient: Patient }) {
           onChange={(e) => set("postcode", maskPostcode(e.target.value))}
           required
         />
+
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-[var(--text-muted)] mt-1">
+          {t("patients.clinical_section_title")}
+        </p>
+        <Input
+          label={`${t("patients.social_name")} (${t("common.optional")})`}
+          name="socialName"
+          value={form.socialName}
+          maxLength={120}
+          onChange={(e) => set("socialName", e.target.value)}
+        />
+        <Input
+          label={`${t("patients.mother_name")} (${t("common.optional")})`}
+          name="motherName"
+          value={form.motherName}
+          maxLength={120}
+          onChange={(e) => set("motherName", e.target.value)}
+        />
+        <div className="grid grid-cols-2 gap-3">
+          <SelectField
+            label={t("patients.sex")}
+            name="sex"
+            value={form.sex}
+            onChange={(v) => set("sex", v)}
+            options={[
+              { value: "MASCULINO", label: t("patients.sex_masculino") },
+              { value: "FEMININO", label: t("patients.sex_feminino") },
+              { value: "OUTRO", label: t("patients.sex_outro") },
+              { value: "NAO_INFORMADO", label: t("patients.sex_nao_informado") },
+            ]}
+          />
+          <SelectField
+            label={t("patients.blood_type")}
+            name="bloodType"
+            value={form.bloodType}
+            onChange={(v) => set("bloodType", v)}
+            options={["A_POS", "A_NEG", "B_POS", "B_NEG", "AB_POS", "AB_NEG", "O_POS", "O_NEG"].map((v) => ({
+              value: v,
+              label: v.replace("_POS", "+").replace("_NEG", "-"),
+            }))}
+          />
+        </div>
+        <TextAreaField
+          label={t("patients.allergies")}
+          name="allergies"
+          value={form.allergies}
+          onChange={(v) => set("allergies", v)}
+        />
+        <TextAreaField
+          label={t("patients.continuous_medications")}
+          name="continuousMedications"
+          value={form.continuousMedications}
+          onChange={(v) => set("continuousMedications", v)}
+        />
+        <TextAreaField
+          label={t("patients.pre_existing_conditions")}
+          name="preExistingConditions"
+          value={form.preExistingConditions}
+          onChange={(v) => set("preExistingConditions", v)}
+        />
+        <Input
+          label={`${t("patients.clinical_alert")} (${t("common.optional")})`}
+          name="clinicalAlert"
+          placeholder={t("patients.clinical_alert_hint")}
+          value={form.clinicalAlert}
+          maxLength={200}
+          onChange={(e) => set("clinicalAlert", e.target.value)}
+        />
+
+        {isMinor(form.birthDate) && (
+          <>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-[var(--text-muted)] mt-1">
+              {t("patients.guardian_section_title")}
+            </p>
+            <p className="text-xs text-[var(--text-muted)] -mt-2">{t("patients.guardian_section_hint")}</p>
+            <Input
+              label={t("patients.guardian_name")}
+              name="guardianName"
+              value={form.guardianName}
+              maxLength={120}
+              error={fieldErrors.guardianName}
+              onChange={(e) => set("guardianName", sanitizeName(e.target.value))}
+              required
+            />
+            <Input
+              label={
+                patient.maskedGuardianCpf
+                  ? `${t("patients.guardian_cpf")} (${patient.maskedGuardianCpf})`
+                  : t("patients.guardian_cpf")
+              }
+              name="guardianCpf"
+              placeholder="000.000.000-00"
+              inputMode="numeric"
+              value={form.guardianCpf}
+              maxLength={14}
+              onChange={(e) => set("guardianCpf", maskCpf(e.target.value))}
+              required={!patient.maskedGuardianCpf}
+            />
+            <SelectField
+              label={t("patients.guardian_relationship")}
+              name="guardianRelationship"
+              value={form.guardianRelationship}
+              onChange={(v) => set("guardianRelationship", v)}
+              options={[
+                { value: "MAE", label: t("patients.guardian_relationship_mae") },
+                { value: "PAI", label: t("patients.guardian_relationship_pai") },
+                { value: "TUTOR", label: t("patients.guardian_relationship_tutor") },
+                { value: "OUTRO", label: t("patients.guardian_relationship_outro") },
+              ]}
+            />
+            <Input
+              label={`${t("patients.guardian_phone")} (${t("common.optional")})`}
+              name="guardianPhone"
+              inputMode="numeric"
+              value={form.guardianPhone}
+              maxLength={15}
+              onChange={(e) => set("guardianPhone", maskPhone(e.target.value))}
+            />
+          </>
+        )}
+
         <SubmitButton />
       </form>
     </Dialog>

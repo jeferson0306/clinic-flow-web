@@ -65,7 +65,8 @@
     "try_again": "Intentar de nuevo",
     "not_found_title": "Página no encontrada",
     "not_found_body": "La página que buscas no existe o fue movida.",
-    "back_to_dashboard": "Volver al inicio"
+    "back_to_dashboard": "Volver al inicio",
+    "optional": "Opcional"
   },
   "patients": {
     "title": "Pacientes",
@@ -83,7 +84,32 @@
     "duplicate_cpf": "Ya existe un paciente con este CPF.",
     "phone_optional": "Opcional",
     "birth_date_optional": "Opcional",
-    "edit": "Editar paciente"
+    "edit": "Editar paciente",
+    "clinical_section_title": "Datos clínicos",
+    "guardian_section_title": "Responsable legal",
+    "guardian_section_hint": "Obligatorio para pacientes menores de 18 años.",
+    "social_name": "Nombre social",
+    "mother_name": "Nombre de la madre",
+    "sex": "Sexo",
+    "sex_masculino": "Masculino",
+    "sex_feminino": "Femenino",
+    "sex_outro": "Otro",
+    "sex_nao_informado": "Prefiere no informar",
+    "blood_type": "Tipo de sangre",
+    "blood_type_unknown": "Desconocido",
+    "allergies": "Alergias",
+    "continuous_medications": "Medicamentos de uso continuo",
+    "pre_existing_conditions": "Condiciones preexistentes",
+    "clinical_alert": "Alerta clínica",
+    "clinical_alert_hint": "Se muestra destacada en la lista de pacientes.",
+    "guardian_name": "Nombre del responsable",
+    "guardian_cpf": "CPF del responsable",
+    "guardian_relationship": "Parentesco",
+    "guardian_relationship_mae": "Madre",
+    "guardian_relationship_pai": "Padre",
+    "guardian_relationship_tutor": "Tutor legal",
+    "guardian_relationship_outro": "Otro",
+    "guardian_phone": "Teléfono del responsable"
   },
   "doctors": {
     "title": "Médicos",

@@ -1,5 +1,6 @@
 "use client";
 
+import { AlertTriangle } from "lucide-react";
 import { DataTable, type ColumnDef } from "@/components/dashboard/data-table";
 import { DeleteButton } from "@/components/dashboard/delete-button";
 import { EditPatientDialog } from "@/components/dashboard/patients/edit-patient-dialog";
@@ -18,7 +19,25 @@ export function PatientsTable({ patients, canManage }: { patients: Patient[]; ca
   const { t } = useTranslation();
 
   const columns: ColumnDef<Patient>[] = [
-    { id: "fullName", header: t("patients.full_name"), accessorFn: (p) => p.fullName },
+    {
+      id: "fullName",
+      header: t("patients.full_name"),
+      accessorFn: (p) => p.fullName,
+      cell: ({ row }) => (
+        <span className="flex items-center gap-1.5">
+          {row.original.clinicalAlert && (
+            <AlertTriangle
+              size={14}
+              className="shrink-0 text-[var(--color-warning)]"
+              aria-label={t("patients.clinical_alert")}
+            >
+              <title>{row.original.clinicalAlert}</title>
+            </AlertTriangle>
+          )}
+          {row.original.fullName}
+        </span>
+      ),
+    },
     { id: "maskedCpf", header: t("patients.masked_cpf"), accessorFn: (p) => p.maskedCpf, enableSorting: false },
     { id: "email", header: t("patients.email"), accessorFn: (p) => p.email },
     { id: "phone", header: t("patients.phone"), accessorFn: (p) => p.phone ?? "—" },

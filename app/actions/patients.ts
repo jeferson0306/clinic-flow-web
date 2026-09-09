@@ -2,8 +2,31 @@
 
 import { revalidatePath } from "next/cache";
 import { api, ApiError } from "@/lib/api";
+import type { BloodType, GuardianRelationship, Sex } from "@/lib/types";
 
 export type FormState = { error: string | null; fieldErrors?: Record<string, string> };
+
+/** Every clinical/legal-guardian field is optional — a blank input becomes `undefined`, never `""`. */
+function clinicalFieldsFrom(formData: FormData) {
+  const field = (name: string): string | undefined => {
+    const value = String(formData.get(name) ?? "").trim();
+    return value || undefined;
+  };
+  return {
+    socialName: field("socialName"),
+    motherName: field("motherName"),
+    sex: field("sex") as Sex | undefined,
+    bloodType: field("bloodType") as BloodType | undefined,
+    allergies: field("allergies"),
+    continuousMedications: field("continuousMedications"),
+    preExistingConditions: field("preExistingConditions"),
+    clinicalAlert: field("clinicalAlert"),
+    guardianName: field("guardianName"),
+    guardianCpf: field("guardianCpf"),
+    guardianRelationship: field("guardianRelationship") as GuardianRelationship | undefined,
+    guardianPhone: field("guardianPhone"),
+  };
+}
 
 export async function createPatient(_prev: FormState, formData: FormData): Promise<FormState> {
   const fullName = String(formData.get("fullName") ?? "").trim();
@@ -25,6 +48,7 @@ export async function createPatient(_prev: FormState, formData: FormData): Promi
       phone: phone || undefined,
       birthDate: birthDate || undefined,
       postcode,
+      ...clinicalFieldsFrom(formData),
     });
   } catch (error) {
     if (error instanceof ApiError && error.body) {
@@ -59,6 +83,7 @@ export async function updatePatient(_prev: FormState, formData: FormData): Promi
       phone: phone || undefined,
       birthDate: birthDate || undefined,
       postcode,
+      ...clinicalFieldsFrom(formData),
     });
   } catch (error) {
     if (error instanceof ApiError && error.body) {
