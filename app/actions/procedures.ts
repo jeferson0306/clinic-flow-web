@@ -21,7 +21,10 @@ export async function createProcedure(_prev: FormState, formData: FormData): Pro
     });
   } catch (error) {
     if (error instanceof ApiError && error.body) {
-      return { error: error.body.category };
+      return {
+        error: error.body.category,
+        fieldErrors: error.body.field ? { [error.body.field]: error.body.message } : undefined,
+      };
     }
     return { error: "unknown" };
   }
@@ -55,7 +58,10 @@ export async function updateProcedure(_prev: FormState, formData: FormData): Pro
     });
   } catch (error) {
     if (error instanceof ApiError && error.body) {
-      return { error: error.body.category };
+      return {
+        error: error.body.category,
+        fieldErrors: error.body.field ? { [error.body.field]: error.body.message } : undefined,
+      };
     }
     return { error: "unknown" };
   }

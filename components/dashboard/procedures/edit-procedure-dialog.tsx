@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog } from "@/components/ui/dialog";
 import { useTranslation } from "@/lib/i18n";
+import { firstFieldErrorMessage } from "@/lib/validation";
 import type { Procedure } from "@/lib/types";
 
 function SubmitButton() {
@@ -23,16 +24,21 @@ function SubmitButton() {
 
 export function EditProcedureDialog({ procedure }: { procedure: Procedure }) {
   const [open, setOpen] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const { t } = useTranslation();
 
   return (
     <Dialog
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (!next) setFieldErrors({});
+      }}
       trigger={
         <button
           type="button"
           title={t("common.edit")}
+          aria-label={t("common.edit")}
           className="inline-flex items-center justify-center h-7 w-7 rounded-md text-[var(--text-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] transition-colors"
         >
           <Pencil size={14} />
@@ -45,9 +51,11 @@ export function EditProcedureDialog({ procedure }: { procedure: Procedure }) {
           const result = await updateProcedure({ error: null }, formData);
           if (result.error === null) {
             toast.success(t("common.update_success"));
+            setFieldErrors({});
             setOpen(false);
           } else {
-            toast.error(t("common.error"));
+            setFieldErrors(result.fieldErrors ?? {});
+            toast.error(firstFieldErrorMessage(result.fieldErrors) ?? t("common.error"));
           }
         }}
         className="flex flex-col gap-3" noValidate
@@ -58,6 +66,7 @@ export function EditProcedureDialog({ procedure }: { procedure: Procedure }) {
           name="name"
           defaultValue={procedure.name}
           maxLength={120}
+          error={fieldErrors.name}
           required
         />
         <Input
@@ -67,6 +76,7 @@ export function EditProcedureDialog({ procedure }: { procedure: Procedure }) {
           min={1}
           max={480}
           defaultValue={procedure.durationMinutes}
+          error={fieldErrors.durationMinutes}
           required
         />
         <Input
@@ -77,6 +87,7 @@ export function EditProcedureDialog({ procedure }: { procedure: Procedure }) {
           max={100000}
           step="0.01"
           defaultValue={(procedure.priceCents / 100).toFixed(2)}
+          error={fieldErrors.priceCents}
           required
         />
         <SubmitButton />

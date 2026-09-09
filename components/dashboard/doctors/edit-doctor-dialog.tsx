@@ -61,6 +61,7 @@ export function EditDoctorDialog({ doctor }: { doctor: Doctor }) {
         <button
           type="button"
           title={t("common.edit")}
+          aria-label={t("common.edit")}
           className="inline-flex items-center justify-center h-7 w-7 rounded-md text-[var(--text-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] transition-colors"
         >
           <Pencil size={14} />

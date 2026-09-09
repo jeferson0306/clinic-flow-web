@@ -8,6 +8,7 @@ import { recordExamResult } from "@/app/actions/exams";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { useTranslation } from "@/lib/i18n";
+import { firstFieldErrorMessage } from "@/lib/validation";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -21,12 +22,16 @@ function SubmitButton() {
 
 export function RecordResultDialog({ examId }: { examId: string }) {
   const [open, setOpen] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const { t } = useTranslation();
 
   return (
     <Dialog
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (!next) setFieldErrors({});
+      }}
       trigger={
         <Button size="sm" variant="ghost">
           <FlaskConical size={14} /> {t("exams.record_result")}
@@ -39,9 +44,11 @@ export function RecordResultDialog({ examId }: { examId: string }) {
           const result = await recordExamResult({ error: null }, formData);
           if (result.error === null) {
             toast.success(t("exams.result_success"));
+            setFieldErrors({});
             setOpen(false);
           } else {
-            toast.error(t("common.error"));
+            setFieldErrors(result.fieldErrors ?? {});
+            toast.error(firstFieldErrorMessage(result.fieldErrors) ?? t("common.error"));
           }
         }}
         className="flex flex-col gap-3" noValidate
@@ -58,6 +65,7 @@ export function RecordResultDialog({ examId }: { examId: string }) {
             required
             className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-hover)] px-3 py-2 text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent)] transition-colors"
           />
+          {fieldErrors.result && <p className="text-xs text-[var(--color-danger)]">{fieldErrors.result}</p>}
         </div>
         <SubmitButton />
       </form>

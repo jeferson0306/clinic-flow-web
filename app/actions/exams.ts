@@ -17,7 +17,10 @@ export async function requestExam(_prev: FormState, formData: FormData): Promise
     await api.exams.request({ patientId, requestedByDoctorId, type });
   } catch (error) {
     if (error instanceof ApiError && error.body) {
-      return { error: error.body.category };
+      return {
+        error: error.body.category,
+        fieldErrors: error.body.field ? { [error.body.field]: error.body.message } : undefined,
+      };
     }
     return { error: "unknown" };
   }
@@ -38,7 +41,10 @@ export async function recordExamResult(_prev: FormState, formData: FormData): Pr
     await api.exams.recordResult(id, result);
   } catch (error) {
     if (error instanceof ApiError && error.body) {
-      return { error: error.body.category };
+      return {
+        error: error.body.category,
+        fieldErrors: error.body.field ? { [error.body.field]: error.body.message } : undefined,
+      };
     }
     return { error: "unknown" };
   }

@@ -24,6 +24,7 @@ export function DeleteButton({
     <button
       type="button"
       title={t("common.delete")}
+      aria-label={t("common.delete")}
       disabled={pending}
       className="inline-flex items-center justify-center h-7 w-7 rounded-md text-[var(--text-muted)] hover:bg-[var(--color-danger)]/10 hover:text-[var(--color-danger)] transition-colors disabled:opacity-50"
       onClick={() => {

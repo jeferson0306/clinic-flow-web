@@ -18,7 +18,10 @@ export async function scheduleAppointment(_prev: FormState, formData: FormData):
     await api.appointments.schedule({ patientId, doctorId, procedureId, startsAt });
   } catch (error) {
     if (error instanceof ApiError && error.body) {
-      return { error: error.body.category };
+      return {
+        error: error.body.category,
+        fieldErrors: error.body.field ? { [error.body.field]: error.body.message } : undefined,
+      };
     }
     return { error: "unknown" };
   }

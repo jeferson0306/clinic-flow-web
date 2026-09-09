@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Combobox } from "@/components/ui/combobox";
 import { Dialog } from "@/components/ui/dialog";
 import { useTranslation } from "@/lib/i18n";
+import { firstFieldErrorMessage } from "@/lib/validation";
 import type { Doctor, Patient } from "@/lib/types";
 
 function SubmitButton() {
@@ -26,6 +27,7 @@ export function NewExamDialog({ patients, doctors }: { patients: Patient[]; doct
   const [open, setOpen] = useState(false);
   const [patientId, setPatientId] = useState("");
   const [doctorId, setDoctorId] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const { t } = useTranslation();
 
   return (
@@ -36,6 +38,7 @@ export function NewExamDialog({ patients, doctors }: { patients: Patient[]; doct
         if (!next) {
           setPatientId("");
           setDoctorId("");
+          setFieldErrors({});
         }
       }}
       trigger={
@@ -50,9 +53,11 @@ export function NewExamDialog({ patients, doctors }: { patients: Patient[]; doct
           const result = await requestExam({ error: null }, formData);
           if (result.error === null) {
             toast.success(t("exams.create_success"));
+            setFieldErrors({});
             setOpen(false);
           } else {
-            toast.error(t("common.error"));
+            setFieldErrors(result.fieldErrors ?? {});
+            toast.error(firstFieldErrorMessage(result.fieldErrors) ?? t("common.error"));
           }
         }}
         className="flex flex-col gap-3" noValidate
@@ -77,7 +82,13 @@ export function NewExamDialog({ patients, doctors }: { patients: Patient[]; doct
           emptyLabel={t("common.empty")}
           options={doctors.map((d) => ({ value: d.id, label: d.fullName, hint: d.specialty }))}
         />
-        <Input label={t("exams.type")} name="type" placeholder="Complete blood count" required />
+        <Input
+          label={t("exams.type")}
+          name="type"
+          placeholder="Complete blood count"
+          error={fieldErrors.type}
+          required
+        />
         <SubmitButton />
       </form>
     </Dialog>

@@ -10,6 +10,7 @@ import { Combobox } from "@/components/ui/combobox";
 import { Dialog } from "@/components/ui/dialog";
 import { useAvailability } from "@/lib/hooks/use-availability";
 import { useTranslation } from "@/lib/i18n";
+import { firstFieldErrorMessage } from "@/lib/validation";
 import type { Doctor, Patient, Procedure } from "@/lib/types";
 
 // No locale argument: falls back to the browser's own locale/timezone.
@@ -90,7 +91,7 @@ export function ScheduleDialog({
           } else if (result.error === "CONFLICT") {
             toast.error(t("appointments.double_booking"));
           } else {
-            toast.error(t("common.error"));
+            toast.error(firstFieldErrorMessage(result.fieldErrors) ?? t("common.error"));
           }
         }}
         className="flex flex-col gap-3" noValidate
