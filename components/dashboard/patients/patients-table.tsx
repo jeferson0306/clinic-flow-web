@@ -14,7 +14,7 @@ import type { Patient } from "@/lib/types";
  * column definitions have to be built on the client side that consumes them.
  * `patients` itself is plain, serializable data and crosses that boundary fine.
  */
-export function PatientsTable({ patients }: { patients: Patient[] }) {
+export function PatientsTable({ patients, canManage }: { patients: Patient[]; canManage: boolean }) {
   const { t } = useTranslation();
 
   const columns: ColumnDef<Patient>[] = [
@@ -27,7 +27,10 @@ export function PatientsTable({ patients }: { patients: Patient[] }) {
       header: t("patients.address"),
       accessorFn: (p) => (p.address.city ? `${p.address.city} — ${p.address.state}` : p.address.postcode),
     },
-    {
+  ];
+
+  if (canManage) {
+    columns.push({
       id: "actions",
       header: t("common.actions"),
       enableSorting: false,
@@ -37,8 +40,8 @@ export function PatientsTable({ patients }: { patients: Patient[] }) {
           <DeleteButton id={row.original.id} deleteAction={deletePatient} />
         </div>
       ),
-    },
-  ];
+    });
+  }
 
   return (
     <DataTable

@@ -11,10 +11,12 @@ export function ExamsTable({
   exams,
   patients,
   doctors,
+  canManage,
 }: {
   exams: Exam[];
   patients: Patient[];
   doctors: Doctor[];
+  canManage: boolean;
 }) {
   const { t } = useTranslation();
 
@@ -39,13 +41,16 @@ export function ExamsTable({
       cell: (info) => <span suppressHydrationWarning>{formatDatetime(info.getValue<string>())}</span>,
     },
     { id: "result", header: t("exams.result"), accessorFn: (e) => e.result ?? t("exams.no_result") },
-    {
+  ];
+
+  if (canManage) {
+    columns.push({
       id: "actions",
       header: t("common.actions"),
       enableSorting: false,
       cell: ({ row }) => (row.original.result ? null : <RecordResultDialog examId={row.original.id} />),
-    },
-  ];
+    });
+  }
 
   return (
     <DataTable

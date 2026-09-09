@@ -118,6 +118,7 @@ export function Sidebar({
               {t("app.name")}
             </span>
           )}
+          {!showLabels && <span className="flex-1" />}
           <button
             type="button"
             onClick={onCloseMobile}
@@ -125,6 +126,15 @@ export function Sidebar({
             className="md:hidden text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
           >
             <X size={16} />
+          </button>
+          <button
+            type="button"
+            onClick={toggle}
+            aria-label={collapsed ? t("common.expand") : t("common.collapse")}
+            title={collapsed ? t("common.expand") : t("common.collapse")}
+            className="hidden md:flex items-center justify-center h-7 w-7 shrink-0 rounded-md text-[var(--text-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] transition-colors"
+          >
+            {collapsed ? <ChevronsRight size={15} /> : <ChevronsLeft size={15} />}
           </button>
         </div>
 
@@ -149,16 +159,6 @@ export function Sidebar({
           );
         })}
       </nav>
-
-      <button
-        type="button"
-        onClick={toggle}
-        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        className="hidden md:flex items-center gap-2 px-4 py-3 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] border-t border-[var(--border)] transition-colors"
-      >
-        {collapsed ? <ChevronsRight size={15} /> : <ChevronsLeft size={15} />}
-        {(!collapsed || !mounted) && <span>{t("common.collapse")}</span>}
-      </button>
       </aside>
     </>
   );

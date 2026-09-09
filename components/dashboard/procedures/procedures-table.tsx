@@ -8,7 +8,7 @@ import { useTranslation } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/utils";
 import type { Procedure } from "@/lib/types";
 
-export function ProceduresTable({ procedures }: { procedures: Procedure[] }) {
+export function ProceduresTable({ procedures, canManage }: { procedures: Procedure[]; canManage: boolean }) {
   const { t } = useTranslation();
 
   const columns: ColumnDef<Procedure>[] = [
@@ -25,7 +25,10 @@ export function ProceduresTable({ procedures }: { procedures: Procedure[] }) {
       accessorFn: (p) => p.priceCents,
       cell: (info) => formatCurrency(info.getValue<number>() / 100),
     },
-    {
+  ];
+
+  if (canManage) {
+    columns.push({
       id: "actions",
       header: t("common.actions"),
       enableSorting: false,
@@ -35,8 +38,8 @@ export function ProceduresTable({ procedures }: { procedures: Procedure[] }) {
           <DeleteButton id={row.original.id} deleteAction={deleteProcedure} />
         </div>
       ),
-    },
-  ];
+    });
+  }
 
   return (
     <DataTable

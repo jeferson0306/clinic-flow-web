@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { animate } from "animejs";
@@ -120,7 +121,15 @@ function Navbar({ onRequestDemo }: { onRequestDemo: () => void }) {
   const { theme, toggle } = useTheme();
 
   return (
-    <header id="main-nav" className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--bg-body)]/80 backdrop-blur-md">
+    <header
+      id="main-nav"
+      // [transform:translateZ(0)] forces this onto its own compositor layer —
+      // a sticky element combined with backdrop-blur and scroll-triggered
+      // animations elsewhere on the page is a known cross-browser combo for
+      // the sticky element intermittently losing its pinned position on an
+      // anchor jump. This is the standard, harmless hardening for it.
+      className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--bg-body)]/80 backdrop-blur-md [transform:translateZ(0)] will-change-transform"
+    >
       <div className="max-w-6xl mx-auto px-4 md:px-6 h-14 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <Logo />
@@ -160,6 +169,9 @@ function Navbar({ onRequestDemo }: { onRequestDemo: () => void }) {
           >
             {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
           </button>
+          <Button asChild size="sm" variant="ghost">
+            <Link href="/login">{t("landing.nav_login")}</Link>
+          </Button>
           <Button size="sm" onClick={onRequestDemo}>
             {t("landing.nav_demo")}
           </Button>
@@ -262,7 +274,7 @@ function HeartbeatDivider() {
 function About() {
   const { t } = useTranslation();
   return (
-    <section id="stack" className="border-y border-[var(--border)] bg-[var(--bg-surface)]">
+    <section id="stack" className="scroll-mt-16 border-y border-[var(--border)] bg-[var(--bg-surface)]">
       <div data-reveal className="max-w-6xl mx-auto px-4 md:px-6 py-14 md:py-20">
         <h2 className="text-xl sm:text-2xl font-bold mb-3 max-w-xl">{t("landing.about_title")}</h2>
         <p className="text-sm sm:text-base text-[var(--text-secondary)] mb-6 max-w-2xl">{t("landing.about_body")}</p>
@@ -302,7 +314,7 @@ function About() {
 function Features() {
   const { t } = useTranslation();
   return (
-    <section id="features" className="max-w-6xl mx-auto px-4 md:px-6 py-16 md:py-24">
+    <section id="features" className="scroll-mt-16 max-w-6xl mx-auto px-4 md:px-6 py-16 md:py-24">
       <div data-reveal className="max-w-xl mb-10 md:mb-14">
         <h2 className="text-2xl sm:text-3xl font-bold mb-3">{t("landing.features_title")}</h2>
         <p className="text-[var(--text-secondary)]">{t("landing.features_subtitle")}</p>
@@ -334,7 +346,7 @@ function HowItWorks() {
     { titleKey: "landing.how_step3_title", bodyKey: "landing.how_step3_body" },
   ];
   return (
-    <section id="how" className="border-y border-[var(--border)] bg-[var(--bg-surface)]">
+    <section id="how" className="scroll-mt-16 border-y border-[var(--border)] bg-[var(--bg-surface)]">
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-16 md:py-24">
         <h2 data-reveal className="text-2xl sm:text-3xl font-bold mb-10 md:mb-14 max-w-xl">
           {t("landing.how_title")}

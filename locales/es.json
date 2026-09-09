@@ -240,6 +240,7 @@
     "request_message": "Mensaje (opcional)",
     "request_submit": "Abrir correo",
     "request_toast": "Abriendo tu cliente de correo...",
-    "mock_appointments": "Citas"
+    "mock_appointments": "Citas",
+    "nav_login": "Entrar"
   }
 }

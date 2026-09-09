@@ -7,7 +7,7 @@ import { deleteDoctor } from "@/app/actions/doctors";
 import { useTranslation } from "@/lib/i18n";
 import type { Doctor } from "@/lib/types";
 
-export function DoctorsTable({ doctors }: { doctors: Doctor[] }) {
+export function DoctorsTable({ doctors, canManage }: { doctors: Doctor[]; canManage: boolean }) {
   const { t } = useTranslation();
 
   const columns: ColumnDef<Doctor>[] = [
@@ -16,7 +16,10 @@ export function DoctorsTable({ doctors }: { doctors: Doctor[] }) {
     { id: "licenseNumber", header: t("doctors.license_number"), accessorFn: (d) => d.licenseNumber },
     { id: "email", header: t("doctors.email"), accessorFn: (d) => d.email },
     { id: "maskedCpf", header: t("doctors.cpf"), accessorFn: (d) => d.maskedCpf, enableSorting: false },
-    {
+  ];
+
+  if (canManage) {
+    columns.push({
       id: "actions",
       header: t("common.actions"),
       enableSorting: false,
@@ -26,8 +29,8 @@ export function DoctorsTable({ doctors }: { doctors: Doctor[] }) {
           <DeleteButton id={row.original.id} deleteAction={deleteDoctor} />
         </div>
       ),
-    },
-  ];
+    });
+  }
 
   return (
     <DataTable

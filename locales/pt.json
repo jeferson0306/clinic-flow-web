@@ -240,6 +240,7 @@
     "request_message": "Mensagem (opcional)",
     "request_submit": "Abrir email",
     "request_toast": "A abrir o teu cliente de email...",
-    "mock_appointments": "Consultas"
+    "mock_appointments": "Consultas",
+    "nav_login": "Entrar"
   }
 }

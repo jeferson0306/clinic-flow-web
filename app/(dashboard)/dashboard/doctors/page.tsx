@@ -1,11 +1,18 @@
 import { api } from "@/lib/api";
+import { getSession } from "@/lib/session";
 import { getDictionary } from "@/lib/i18n-server";
 import { DoctorsTable } from "@/components/dashboard/doctors/doctors-table";
 import { NewDoctorDialog } from "@/components/dashboard/doctors/new-doctor-dialog";
 import type { Doctor } from "@/lib/types";
 
 export default async function DoctorsPage() {
-  const [t, doctors] = await Promise.all([getDictionary(), api.doctors.list().catch(() => [] as Doctor[])]);
+  const [t, session, doctors] = await Promise.all([
+    getDictionary(),
+    getSession(),
+    api.doctors.list().catch(() => [] as Doctor[]),
+  ]);
+  // Create/edit/delete are @RolesAllowed("ADMIN") on the backend.
+  const canManage = session?.role === "ADMIN";
 
   return (
     <main className="p-6">
@@ -14,10 +21,10 @@ export default async function DoctorsPage() {
           <h1 className="text-base font-semibold text-[var(--text-primary)] mb-1">{t("doctors.title")}</h1>
           <p className="text-sm text-[var(--text-secondary)]">{t("doctors.subtitle")}</p>
         </div>
-        <NewDoctorDialog />
+        {canManage && <NewDoctorDialog />}
       </div>
 
-      <DoctorsTable doctors={doctors} />
+      <DoctorsTable doctors={doctors} canManage={canManage} />
     </main>
   );
 }
