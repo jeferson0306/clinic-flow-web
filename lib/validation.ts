@@ -122,3 +122,15 @@ export function firstFieldErrorMessage(fieldErrors: Record<string, string> | und
   const values = Object.values(fieldErrors ?? {});
   return values.length > 0 ? values[0] : null;
 }
+
+/** Mirrors the backend's PasswordPolicy exactly — the frontend's copy is UX (block early, explain why), the backend's is the real boundary. */
+export const PASSWORD_MIN_LENGTH = 10;
+
+export function isStrongPassword(password: string): boolean {
+  if (password.length < PASSWORD_MIN_LENGTH) return false;
+  if (!/[A-Z]/.test(password)) return false;
+  if (!/[a-z]/.test(password)) return false;
+  if (!/[0-9]/.test(password)) return false;
+  if (/^[A-Za-z0-9]*$/.test(password)) return false; // must contain a special character
+  return true;
+}

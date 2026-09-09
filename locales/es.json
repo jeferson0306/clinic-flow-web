@@ -15,15 +15,22 @@
   "auth": {
     "login": "Iniciar sesión",
     "logout": "Cerrar sesión",
-    "username": "Usuario",
     "password": "Contraseña",
     "welcome_back": "Bienvenido de nuevo",
     "sign_in_subtitle": "Inicia sesión para gestionar la clínica",
-    "invalid_credentials": "Usuario o contraseña incorrectos",
-    "missing_fields": "Introduce el usuario y la contraseña",
+    "invalid_credentials": "Correo o contraseña incorrectos",
+    "missing_fields": "Introduce el correo y la contraseña",
     "unknown_error": "No se pudo iniciar sesión. Inténtalo de nuevo.",
     "signed_in_as": "Sesión iniciada como",
-    "request_access": "¿Aún no tienes acceso? Pide una demo"
+    "request_access": "¿Aún no tienes acceso? Pide una demo",
+    "email": "Correo electrónico",
+    "change_password": "Cambiar contraseña",
+    "change_password_subtitle": "Define una nueva contraseña para tu cuenta.",
+    "current_password": "Contraseña actual",
+    "new_password": "Nueva contraseña",
+    "password_requirements": "Mínimo 10 caracteres, con mayúscula, minúscula, número y carácter especial.",
+    "change_password_success": "Contraseña cambiada con éxito.",
+    "wrong_current_password": "La contraseña actual es incorrecta."
   },
   "common": {
     "save": "Guardar",
@@ -158,7 +165,8 @@
     "invalid_email": "Correo electrónico inválido.",
     "invalid_phone": "Teléfono inválido: use 10 u 11 dígitos.",
     "invalid_postcode": "Código postal inválido: debe tener 8 dígitos.",
-    "invalid_birth_date": "Fecha de nacimiento inválida: no puede ser futura ni anterior a 120 años."
+    "invalid_birth_date": "Fecha de nacimiento inválida: no puede ser futura ni anterior a 120 años.",
+    "invalid_password": "Contraseña débil — mínimo 10 caracteres, con mayúscula, minúscula, número y carácter especial."
   },
   "system_health": {
     "title": "Estado del sistema",

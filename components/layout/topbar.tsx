@@ -1,18 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { LogOut, Menu, Moon, Sun } from "lucide-react";
+import Link from "next/link";
+import { KeyRound, LogOut, Menu, Moon, Sun } from "lucide-react";
 import { logout } from "@/app/actions/auth";
 import { useTheme } from "@/lib/theme";
 import { LOCALE_LABELS, useTranslation, type Locale } from "@/lib/i18n";
 import type { Role } from "@/lib/types";
 
 export function Topbar({
-  username,
+  email,
   role,
   onOpenMobileNav,
 }: {
-  username: string;
+  email: string;
   role: Role;
   onOpenMobileNav: () => void;
 }) {
@@ -32,7 +33,7 @@ export function Topbar({
           <Menu size={17} />
         </button>
         <p className="text-xs text-[var(--text-muted)] truncate">
-          {t("auth.signed_in_as")} <span className="font-medium text-[var(--text-secondary)]">{username}</span>{" "}
+          {t("auth.signed_in_as")} <span className="font-medium text-[var(--text-secondary)]">{email}</span>{" "}
           &middot; {role}
         </p>
       </div>
@@ -73,6 +74,14 @@ export function Topbar({
         >
           {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
         </button>
+
+        <Link
+          href="/dashboard/settings"
+          title={t("auth.change_password")}
+          className="flex items-center justify-center h-8 w-8 rounded-lg text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] transition-colors"
+        >
+          <KeyRound size={15} />
+        </Link>
 
         <form action={logout}>
           <button

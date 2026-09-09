@@ -15,15 +15,22 @@
   "auth": {
     "login": "Entrar",
     "logout": "Sair",
-    "username": "Utilizador",
     "password": "Senha",
     "welcome_back": "Bem-vindo de volta",
     "sign_in_subtitle": "Entre com a sua conta para gerir a clínica",
-    "invalid_credentials": "Utilizador ou senha incorretos",
-    "missing_fields": "Preencha o utilizador e a senha",
+    "invalid_credentials": "Email ou senha incorretos",
+    "missing_fields": "Preenche o email e a senha",
     "unknown_error": "Não foi possível entrar. Tente novamente.",
     "signed_in_as": "Sessão iniciada como",
-    "request_access": "Ainda não tens acesso? Pede uma demo"
+    "request_access": "Ainda não tens acesso? Pede uma demo",
+    "email": "Email",
+    "change_password": "Alterar senha",
+    "change_password_subtitle": "Define uma nova senha para a tua conta.",
+    "current_password": "Senha atual",
+    "new_password": "Nova senha",
+    "password_requirements": "Mínimo de 10 caracteres, com maiúscula, minúscula, número e caractere especial.",
+    "change_password_success": "Senha alterada com sucesso.",
+    "wrong_current_password": "Senha atual incorreta."
   },
   "common": {
     "save": "Salvar",
@@ -158,7 +165,8 @@
     "invalid_email": "E-mail inválido.",
     "invalid_phone": "Telefone inválido: use 10 ou 11 dígitos.",
     "invalid_postcode": "CEP inválido: deve ter 8 dígitos.",
-    "invalid_birth_date": "Data de nascimento inválida: não pode ser no futuro nem anterior a 120 anos."
+    "invalid_birth_date": "Data de nascimento inválida: não pode ser no futuro nem anterior a 120 anos.",
+    "invalid_password": "Senha fraca — mínimo de 10 caracteres, com maiúscula, minúscula, número e caractere especial."
   },
   "system_health": {
     "title": "Estado do sistema",

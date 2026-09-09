@@ -54,7 +54,7 @@ export default async function DashboardPage() {
     <main className="p-6">
       <h1 className="text-base font-semibold text-[var(--text-primary)] mb-1">{t("dashboard.title")}</h1>
       <p className="text-sm text-[var(--text-secondary)]">
-        {t("dashboard.welcome")}, {session?.username}
+        {t("dashboard.welcome")}, {session?.email}
       </p>
 
       <div className="mt-6">

@@ -97,12 +97,15 @@ async function fetchHealth(): Promise<HealthReport> {
 }
 
 export const api = {
-  login: (username: string, password: string) =>
-    request<LoginResponse & { username: string }>("/v1/auth/login", {
+  login: (email: string, password: string) =>
+    request<LoginResponse & { email: string }>("/v1/auth/login", {
       method: "POST",
-      body: { username, password },
+      body: { email, password },
       auth: false,
-    }).then((r) => ({ ...r, username })),
+    }).then((r) => ({ ...r, email })),
+
+  changePassword: (currentPassword: string, newPassword: string) =>
+    request<void>("/v1/auth/password", { method: "PUT", body: { currentPassword, newPassword } }),
 
   patients: {
     list: () => request<Patient[]>("/v1/patients"),

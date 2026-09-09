@@ -12,11 +12,11 @@ import type { Role } from "@/lib/types";
  * permanent flex width; see its own component for the responsive classes.
  */
 export function DashboardShell({
-  username,
+  email,
   role,
   children,
 }: {
-  username: string;
+  email: string;
   role: Role;
   children: React.ReactNode;
 }) {
@@ -26,7 +26,7 @@ export function DashboardShell({
     <div className="flex h-dvh bg-[var(--bg-body)] overflow-hidden">
       <Sidebar mobileOpen={mobileOpen} onCloseMobile={() => setMobileOpen(false)} role={role} />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Topbar username={username} role={role} onOpenMobileNav={() => setMobileOpen(true)} />
+        <Topbar email={email} role={role} onOpenMobileNav={() => setMobileOpen(true)} />
         <div className="flex-1 overflow-auto">{children}</div>
       </div>
     </div>

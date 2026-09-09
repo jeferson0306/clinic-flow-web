@@ -8,7 +8,7 @@ function exact(text: string): RegExp {
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/login");
-  await page.getByLabel(/utilizador|username|usuario/i).fill("admin");
+  await page.getByLabel(/email|correo/i).fill("admin@clinicflow.dev");
   await page.getByLabel(/senha|password|contraseña/i).fill("admin123");
   await page.getByRole("button", { name: /entrar|sign in|iniciar sesión/i }).click();
   await expect(page).toHaveURL(/\/dashboard/);

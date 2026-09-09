@@ -10,7 +10,7 @@ import { cookies } from "next/headers";
  */
 const COOKIE_NAME = "clinic_flow_session";
 
-export type Session = { token: string; role: "ADMIN" | "DOCTOR"; username: string };
+export type Session = { token: string; role: "ADMIN" | "DOCTOR"; email: string };
 
 export async function setSession(session: Session): Promise<void> {
   const store = await cookies();
