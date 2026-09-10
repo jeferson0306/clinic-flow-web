@@ -42,7 +42,16 @@ const FEATURES = [
   { icon: Activity, titleKey: "landing.feature_health_title", bodyKey: "landing.feature_health_body" },
 ] as const;
 
-const STACK_BADGES = ["Java 25 · Quarkus", "Next.js 16 · React 19", "PostgreSQL (Neon)", "JWT · RBAC", "AWS S3 · SNS · SQS"];
+const STACK_BADGES = [
+  "Java 25 · Quarkus",
+  "Next.js 16 · React 19",
+  "PostgreSQL (Neon)",
+  "JWT · Refresh Tokens",
+  "RBAC · 4 roles",
+  "Audit Log (LGPD)",
+  "Sentry",
+  "AWS S3 · SNS · SQS",
+];
 
 function Logo() {
   return (
@@ -304,6 +313,53 @@ function Hero({ onRequestDemo }: { onRequestDemo: () => void }) {
   );
 }
 
+/**
+ * A real number from the live backend instead of a static, easy-to-fabricate
+ * one — the honest version of social proof for a portfolio project is "this
+ * is actually running," not an invented user count. `/api/catalog-stats`
+ * fails open with `null` (see its own route), which this renders as the
+ * fallback copy rather than a broken-looking blank or a spinner stuck
+ * forever if the backend (Render free tier) is asleep.
+ */
+function LiveStatus() {
+  const { t } = useTranslation();
+  const [count, setCount] = useState<number | null | undefined>(undefined);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/catalog-stats")
+      .then((res) => res.json())
+      .then((data: { procedureCount: number | null }) => {
+        if (!cancelled) setCount(data.procedureCount);
+      })
+      .catch(() => {
+        if (!cancelled) setCount(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 md:px-6 -mt-4 mb-2">
+      <div className="inline-flex items-center gap-2 text-xs text-[var(--text-muted)] rounded-full border border-[var(--border)] bg-[var(--bg-surface)] px-3 py-1.5">
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-success)] opacity-60" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-success)]" />
+        </span>
+        {typeof count === "number" ? (
+          <span>
+            {t("landing.live_prefix")} <strong className="text-[var(--text-primary)]">{count}</strong>{" "}
+            {t("landing.live_suffix")}
+          </span>
+        ) : (
+          <span>{t("landing.live_fallback")}</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function HeartbeatDivider() {
   return (
     <div className="relative h-8 overflow-hidden text-[var(--accent)]/30">
@@ -562,6 +618,7 @@ export function LandingPage() {
       <Navbar onRequestDemo={() => setRequestOpen(true)} />
       <main className="flex-1">
         <Hero onRequestDemo={() => setRequestOpen(true)} />
+        <LiveStatus />
         <HeartbeatDivider />
         <About />
         <Features />
