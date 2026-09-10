@@ -80,6 +80,8 @@
     "postcode": "CEP",
     "house_number": "Número",
     "complement": "Complemento",
+    "cep_checking": "A verificar o CEP…",
+    "cep_not_found": "CEP não encontrado — confirma se está correto.",
     "address": "Endereço",
     "masked_cpf": "CPF (mascarado)",
     "create_success": "Paciente registado com sucesso.",

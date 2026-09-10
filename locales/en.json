@@ -80,6 +80,8 @@
     "postcode": "Postcode",
     "house_number": "House number",
     "complement": "Complement",
+    "cep_checking": "Checking postcode…",
+    "cep_not_found": "Postcode not found — double-check it's correct.",
     "address": "Address",
     "masked_cpf": "CPF (masked)",
     "create_success": "Patient registered successfully.",

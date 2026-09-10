@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { SelectField } from "@/components/ui/select-field";
 import { TextAreaField } from "@/components/ui/textarea-field";
 import { Dialog } from "@/components/ui/dialog";
+import { CepPreview } from "@/components/dashboard/patients/cep-preview";
 import { useTranslation } from "@/lib/i18n";
 import {
   earliestBirthDateIso,
@@ -187,6 +188,7 @@ export function NewPatientDialog() {
           onChange={(e) => set("postcode", maskPostcode(e.target.value))}
           required
         />
+        <CepPreview postcode={form.postcode} />
         <div className="grid grid-cols-2 gap-3">
           <Input
             label={t("patients.house_number")}

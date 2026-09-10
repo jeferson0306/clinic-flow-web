@@ -80,6 +80,8 @@
     "postcode": "Código postal",
     "house_number": "Número",
     "complement": "Complemento",
+    "cep_checking": "Verificando el código postal…",
+    "cep_not_found": "Código postal no encontrado — confirma que esté correcto.",
     "address": "Dirección",
     "masked_cpf": "CPF (enmascarado)",
     "create_success": "Paciente registrado con éxito.",
