@@ -45,6 +45,8 @@ function formFromPatient(patient: Patient) {
     phone: patient.phone ?? "",
     birthDate: patient.birthDate ?? "",
     postcode: patient.address.postcode,
+    houseNumber: patient.address.houseNumber,
+    complement: patient.address.complement ?? "",
     socialName: patient.socialName ?? "",
     motherName: patient.motherName ?? "",
     sex: patient.sex ?? "",
@@ -103,6 +105,7 @@ export function EditPatientDialog({ patient }: { patient: Patient }) {
           if (!isValidOptionalPhone(form.phone)) errors.phone = t("validation.invalid_phone");
           if (!isValidOptionalBirthDate(form.birthDate)) errors.birthDate = t("validation.invalid_birth_date");
           if (!isCompletePostcode(form.postcode)) errors.postcode = t("validation.invalid_postcode");
+          if (!form.houseNumber.trim()) errors.houseNumber = t("validation.invalid_house_number");
           // guardianCpf is exempt when a masked one is already on file — an
           // untouched (blank) field there means "keep it," not "missing."
           if (
@@ -180,6 +183,24 @@ export function EditPatientDialog({ patient }: { patient: Patient }) {
           onChange={(e) => set("postcode", maskPostcode(e.target.value))}
           required
         />
+        <div className="grid grid-cols-2 gap-3">
+          <Input
+            label={t("patients.house_number")}
+            name="houseNumber"
+            value={form.houseNumber}
+            maxLength={20}
+            error={fieldErrors.houseNumber}
+            onChange={(e) => set("houseNumber", e.target.value)}
+            required
+          />
+          <Input
+            label={`${t("patients.complement")} (${t("common.optional")})`}
+            name="complement"
+            value={form.complement}
+            maxLength={60}
+            onChange={(e) => set("complement", e.target.value)}
+          />
+        </div>
 
         <p className="text-[10px] font-semibold uppercase tracking-widest text-[var(--text-muted)] mt-1">
           {t("patients.clinical_section_title")}

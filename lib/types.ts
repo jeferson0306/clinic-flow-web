@@ -11,6 +11,8 @@ export type Address = {
   city: string | null;
   state: string | null;
   ibgeCode: string | null;
+  houseNumber: string;
+  complement: string | null;
 };
 
 export type Sex = "MASCULINO" | "FEMININO" | "OUTRO" | "NAO_INFORMADO";
@@ -47,6 +49,7 @@ export type Doctor = {
   fullName: string;
   maskedCpf: string;
   email: string;
+  phone: string | null;
   specialty: string;
   licenseNumber: string;
   createdAt: string;

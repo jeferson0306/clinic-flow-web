@@ -10,7 +10,14 @@ import { Input } from "@/components/ui/input";
 import { Dialog } from "@/components/ui/dialog";
 import { useTranslation } from "@/lib/i18n";
 import type { Doctor } from "@/lib/types";
-import { firstFieldErrorMessage, isValidEmailShape, isValidName, sanitizeName } from "@/lib/validation";
+import {
+  firstFieldErrorMessage,
+  isValidEmailShape,
+  isValidName,
+  isValidOptionalPhone,
+  maskPhone,
+  sanitizeName,
+} from "@/lib/validation";
 
 /** Only the categories with a nicer localized message than the backend's own raw text — everything else falls through to that raw message instead. */
 function errorMessage(t: (k: string) => string, error: string | null): string | null {
@@ -32,6 +39,7 @@ function formFromDoctor(doctor: Doctor) {
   return {
     fullName: doctor.fullName,
     email: doctor.email,
+    phone: doctor.phone ?? "",
     specialty: doctor.specialty,
     licenseNumber: doctor.licenseNumber,
   };
@@ -74,6 +82,7 @@ export function EditDoctorDialog({ doctor }: { doctor: Doctor }) {
           const errors: Record<string, string> = {};
           if (!isValidName(form.fullName)) errors.fullName = t("validation.invalid_name");
           if (!isValidEmailShape(form.email)) errors.email = t("validation.invalid_email");
+          if (!isValidOptionalPhone(form.phone)) errors.phone = t("validation.invalid_phone");
           if (Object.keys(errors).length > 0) {
             setFieldErrors(errors);
             return;
@@ -110,6 +119,15 @@ export function EditDoctorDialog({ doctor }: { doctor: Doctor }) {
           error={fieldErrors.email}
           onChange={(e) => set("email", e.target.value)}
           required
+        />
+        <Input
+          label={`${t("doctors.phone")} (${t("patients.phone_optional")})`}
+          name="phone"
+          inputMode="numeric"
+          value={form.phone}
+          maxLength={15}
+          error={fieldErrors.phone}
+          onChange={(e) => set("phone", maskPhone(e.target.value))}
         />
         <Input
           label={t("doctors.specialty")}

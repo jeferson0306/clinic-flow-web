@@ -8,6 +8,7 @@ export async function createDoctor(_prev: FormState, formData: FormData): Promis
   const fullName = String(formData.get("fullName") ?? "").trim();
   const cpf = String(formData.get("cpf") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
   const specialty = String(formData.get("specialty") ?? "").trim();
   const licenseNumber = String(formData.get("licenseNumber") ?? "").trim();
 
@@ -16,7 +17,7 @@ export async function createDoctor(_prev: FormState, formData: FormData): Promis
   }
 
   try {
-    await api.doctors.create({ fullName, cpf, email, specialty, licenseNumber });
+    await api.doctors.create({ fullName, cpf, email, phone: phone || undefined, specialty, licenseNumber });
   } catch (error) {
     if (error instanceof ApiError && error.body) {
       return {
@@ -35,6 +36,7 @@ export async function updateDoctor(_prev: FormState, formData: FormData): Promis
   const id = String(formData.get("id") ?? "");
   const fullName = String(formData.get("fullName") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
   const specialty = String(formData.get("specialty") ?? "").trim();
   const licenseNumber = String(formData.get("licenseNumber") ?? "").trim();
 
@@ -43,7 +45,7 @@ export async function updateDoctor(_prev: FormState, formData: FormData): Promis
   }
 
   try {
-    await api.doctors.update(id, { fullName, email, specialty, licenseNumber });
+    await api.doctors.update(id, { fullName, email, phone: phone || undefined, specialty, licenseNumber });
   } catch (error) {
     if (error instanceof ApiError && error.body) {
       return {

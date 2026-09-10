@@ -52,7 +52,10 @@ export function PatientsTable({
     {
       id: "address",
       header: t("patients.address"),
-      accessorFn: (p) => (p.address.city ? `${p.address.city} — ${p.address.state}` : p.address.postcode),
+      accessorFn: (p) =>
+        p.address.city
+          ? `${p.address.street ? `${p.address.street}, ${p.address.houseNumber} — ` : ""}${p.address.city}/${p.address.state}`
+          : p.address.postcode,
     },
   ];
 

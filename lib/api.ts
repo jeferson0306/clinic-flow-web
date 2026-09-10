@@ -152,12 +152,21 @@ export const api = {
         phone?: string;
         birthDate?: string;
         postcode: string;
+        houseNumber: string;
+        complement?: string;
       } & PatientClinicalFields,
     ) => request<Patient>("/v1/patients", { method: "POST", body: data }),
     update: (
       id: string,
-      data: { fullName: string; email: string; phone?: string; birthDate?: string; postcode: string } &
-        PatientClinicalFields,
+      data: {
+        fullName: string;
+        email: string;
+        phone?: string;
+        birthDate?: string;
+        postcode: string;
+        houseNumber: string;
+        complement?: string;
+      } & PatientClinicalFields,
     ) => request<Patient>(`/v1/patients/${id}`, { method: "PUT", body: data }),
     delete: (id: string) => request<void>(`/v1/patients/${id}`, { method: "DELETE" }),
   },
@@ -169,12 +178,13 @@ export const api = {
       fullName: string;
       cpf: string;
       email: string;
+      phone?: string;
       specialty: string;
       licenseNumber: string;
     }) => request<Doctor>("/v1/doctors", { method: "POST", body: data }),
     update: (
       id: string,
-      data: { fullName: string; email: string; specialty: string; licenseNumber: string },
+      data: { fullName: string; email: string; phone?: string; specialty: string; licenseNumber: string },
     ) => request<Doctor>(`/v1/doctors/${id}`, { method: "PUT", body: data }),
     delete: (id: string) => request<void>(`/v1/doctors/${id}`, { method: "DELETE" }),
     availability: (id: string, procedureId: string, date: string) =>

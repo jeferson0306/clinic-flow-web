@@ -28,7 +28,7 @@
     "change_password_subtitle": "Set a new password for your account.",
     "current_password": "Current password",
     "new_password": "New password",
-    "password_requirements": "At least 10 characters, with uppercase, lowercase, a digit and a special character.",
+    "password_requirements": "At least 12 characters, with uppercase, lowercase, a digit and a special character.",
     "change_password_success": "Password changed successfully.",
     "wrong_current_password": "Current password is incorrect."
   },
@@ -78,6 +78,8 @@
     "phone": "Phone",
     "birth_date": "Birth date",
     "postcode": "Postcode",
+    "house_number": "House number",
+    "complement": "Complement",
     "address": "Address",
     "masked_cpf": "CPF (masked)",
     "create_success": "Patient registered successfully.",
@@ -118,6 +120,7 @@
     "full_name": "Full name",
     "cpf": "CPF",
     "email": "Email",
+    "phone": "Phone",
     "specialty": "Specialty",
     "license_number": "Licence number",
     "create_success": "Doctor registered successfully.",
@@ -201,8 +204,9 @@
     "invalid_email": "Invalid email address.",
     "invalid_phone": "Invalid phone: use 10 or 11 digits.",
     "invalid_postcode": "Invalid postcode: must have 8 digits.",
+    "invalid_house_number": "House number is required.",
     "invalid_birth_date": "Invalid birth date: cannot be in the future or more than 120 years ago.",
-    "invalid_password": "Weak password — at least 10 characters, with uppercase, lowercase, a digit and a special character."
+    "invalid_password": "Weak password — at least 12 characters, with uppercase, lowercase, a digit and a special character."
   },
   "system_health": {
     "title": "System health",

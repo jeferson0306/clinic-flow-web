@@ -15,6 +15,7 @@ export function DoctorsTable({ doctors, canManage }: { doctors: Doctor[]; canMan
     { id: "specialty", header: t("doctors.specialty"), accessorFn: (d) => d.specialty },
     { id: "licenseNumber", header: t("doctors.license_number"), accessorFn: (d) => d.licenseNumber },
     { id: "email", header: t("doctors.email"), accessorFn: (d) => d.email },
+    { id: "phone", header: t("doctors.phone"), accessorFn: (d) => d.phone ?? "—" },
     { id: "maskedCpf", header: t("doctors.cpf"), accessorFn: (d) => d.maskedCpf, enableSorting: false },
   ];
 

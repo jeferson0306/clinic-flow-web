@@ -35,8 +35,10 @@ export async function createPatient(_prev: FormState, formData: FormData): Promi
   const phone = String(formData.get("phone") ?? "").trim();
   const birthDate = String(formData.get("birthDate") ?? "").trim();
   const postcode = String(formData.get("postcode") ?? "").trim();
+  const houseNumber = String(formData.get("houseNumber") ?? "").trim();
+  const complement = String(formData.get("complement") ?? "").trim();
 
-  if (!fullName || !cpf || !email || !postcode) {
+  if (!fullName || !cpf || !email || !postcode || !houseNumber) {
     return { error: "missing_fields" };
   }
 
@@ -48,6 +50,8 @@ export async function createPatient(_prev: FormState, formData: FormData): Promi
       phone: phone || undefined,
       birthDate: birthDate || undefined,
       postcode,
+      houseNumber,
+      complement: complement || undefined,
       ...clinicalFieldsFrom(formData),
     });
   } catch (error) {
@@ -71,8 +75,10 @@ export async function updatePatient(_prev: FormState, formData: FormData): Promi
   const phone = String(formData.get("phone") ?? "").trim();
   const birthDate = String(formData.get("birthDate") ?? "").trim();
   const postcode = String(formData.get("postcode") ?? "").trim();
+  const houseNumber = String(formData.get("houseNumber") ?? "").trim();
+  const complement = String(formData.get("complement") ?? "").trim();
 
-  if (!id || !fullName || !email || !postcode) {
+  if (!id || !fullName || !email || !postcode || !houseNumber) {
     return { error: "missing_fields" };
   }
 
@@ -83,6 +89,8 @@ export async function updatePatient(_prev: FormState, formData: FormData): Promi
       phone: phone || undefined,
       birthDate: birthDate || undefined,
       postcode,
+      houseNumber,
+      complement: complement || undefined,
       ...clinicalFieldsFrom(formData),
     });
   } catch (error) {

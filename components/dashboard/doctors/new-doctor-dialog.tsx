@@ -14,11 +14,13 @@ import {
   isValidCpf,
   isValidEmailShape,
   isValidName,
+  isValidOptionalPhone,
   maskCpf,
+  maskPhone,
   sanitizeName,
 } from "@/lib/validation";
 
-const EMPTY_FORM = { fullName: "", cpf: "", email: "", specialty: "", licenseNumber: "" };
+const EMPTY_FORM = { fullName: "", cpf: "", email: "", phone: "", specialty: "", licenseNumber: "" };
 
 /** Only the categories with a nicer localized message than the backend's own raw text — everything else falls through to that raw message instead. */
 function errorMessage(t: (k: string) => string, error: string | null): string | null {
@@ -69,6 +71,7 @@ export function NewDoctorDialog() {
           if (!isValidName(form.fullName)) errors.fullName = t("validation.invalid_name");
           if (!isValidCpf(form.cpf)) errors.cpf = t("validation.invalid_cpf");
           if (!isValidEmailShape(form.email)) errors.email = t("validation.invalid_email");
+          if (!isValidOptionalPhone(form.phone)) errors.phone = t("validation.invalid_phone");
           if (Object.keys(errors).length > 0) {
             setFieldErrors(errors);
             return;
@@ -116,6 +119,15 @@ export function NewDoctorDialog() {
           error={fieldErrors.email}
           onChange={(e) => set("email", e.target.value)}
           required
+        />
+        <Input
+          label={`${t("doctors.phone")} (${t("patients.phone_optional")})`}
+          name="phone"
+          inputMode="numeric"
+          value={form.phone}
+          maxLength={15}
+          error={fieldErrors.phone}
+          onChange={(e) => set("phone", maskPhone(e.target.value))}
         />
         <Input
           label={t("doctors.specialty")}
