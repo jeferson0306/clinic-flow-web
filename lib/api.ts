@@ -149,8 +149,8 @@ export const api = {
         fullName: string;
         cpf: string;
         email: string;
-        phone?: string;
-        birthDate?: string;
+        phone: string;
+        birthDate: string;
         postcode: string;
         houseNumber: string;
         complement?: string;
@@ -161,8 +161,8 @@ export const api = {
       data: {
         fullName: string;
         email: string;
-        phone?: string;
-        birthDate?: string;
+        phone: string;
+        birthDate: string;
         postcode: string;
         houseNumber: string;
         complement?: string;

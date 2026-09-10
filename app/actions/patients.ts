@@ -38,7 +38,7 @@ export async function createPatient(_prev: FormState, formData: FormData): Promi
   const houseNumber = String(formData.get("houseNumber") ?? "").trim();
   const complement = String(formData.get("complement") ?? "").trim();
 
-  if (!fullName || !cpf || !email || !postcode || !houseNumber) {
+  if (!fullName || !cpf || !email || !phone || !birthDate || !postcode || !houseNumber) {
     return { error: "missing_fields" };
   }
 
@@ -47,8 +47,8 @@ export async function createPatient(_prev: FormState, formData: FormData): Promi
       fullName,
       cpf,
       email,
-      phone: phone || undefined,
-      birthDate: birthDate || undefined,
+      phone,
+      birthDate,
       postcode,
       houseNumber,
       complement: complement || undefined,
@@ -78,7 +78,7 @@ export async function updatePatient(_prev: FormState, formData: FormData): Promi
   const houseNumber = String(formData.get("houseNumber") ?? "").trim();
   const complement = String(formData.get("complement") ?? "").trim();
 
-  if (!id || !fullName || !email || !postcode || !houseNumber) {
+  if (!id || !fullName || !email || !phone || !birthDate || !postcode || !houseNumber) {
     return { error: "missing_fields" };
   }
 
@@ -86,8 +86,8 @@ export async function updatePatient(_prev: FormState, formData: FormData): Promi
     await api.patients.update(id, {
       fullName,
       email,
-      phone: phone || undefined,
-      birthDate: birthDate || undefined,
+      phone,
+      birthDate,
       postcode,
       houseNumber,
       complement: complement || undefined,

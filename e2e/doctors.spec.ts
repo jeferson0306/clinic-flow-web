@@ -50,7 +50,7 @@ test("registers, edits (without touching CPF), and deletes a doctor", async ({ p
   await page.getByRole("button", { name: /^save$|^salvar$|^guardar$/i }).click();
   await expect(page.getByText("Cardiology and Vascular Surgery")).toBeVisible();
 
-  page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("row", { name: exact(fullName) }).getByTitle(/delete|excluir|eliminar/i).click();
+  await page.getByRole("dialog").getByRole("button", { name: /^delete$|^excluir$|^eliminar$/i }).click();
   await expect(page.getByText(fullName)).not.toBeVisible();
 });

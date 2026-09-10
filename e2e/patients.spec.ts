@@ -47,7 +47,10 @@ test("registers a patient and lists them with a masked CPF", async ({ page }) =>
   await page.getByLabel(/nome completo|full name|nombre completo/i).fill(fullName);
   await page.getByLabel(/^cpf$/i).fill(uniqueCpf());
   await page.getByLabel(/email|correio|correo/i).fill(`${Date.now()}@example.com`);
+  await page.getByLabel(/^telefone$|^phone$|^teléfono$/i).fill("11987654321");
+  await page.getByLabel(/data de nascimento|birth date|fecha de nacimiento/i).fill("1990-05-10");
   await page.getByLabel(/cep|postcode|código postal/i).fill("01310-200");
+  await page.getByLabel(/^número$|^house number$/i).fill("123");
 
   await page.getByRole("button", { name: /^criar$|^create$|^crear$/i }).click();
 
@@ -64,8 +67,9 @@ test("registers a patient and lists them with a masked CPF", async ({ page }) =>
   await page.getByRole("button", { name: /^save$|^salvar$|^guardar$/i }).click();
   await expect(page.getByText(updatedName)).toBeVisible();
 
-  // Delete: accept the native confirm and verify the row is gone.
-  page.once("dialog", (dialog) => dialog.accept());
+  // Delete: confirm in the dialog (DeleteButton, not window.confirm) and
+  // verify the row is gone.
   await page.getByRole("row", { name: exact(updatedName) }).getByTitle(/delete|excluir|eliminar/i).click();
+  await page.getByRole("dialog").getByRole("button", { name: /^delete$|^excluir$|^eliminar$/i }).click();
   await expect(page.getByText(updatedName)).not.toBeVisible();
 });

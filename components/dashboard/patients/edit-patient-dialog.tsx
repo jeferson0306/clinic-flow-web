@@ -19,8 +19,8 @@ import {
   isCompletePostcode,
   isValidEmailShape,
   isValidName,
-  isValidOptionalBirthDate,
-  isValidOptionalPhone,
+  isValidBirthDate,
+  isValidRequiredPhone,
   isMinor,
   maskCpf,
   maskPhone,
@@ -43,8 +43,8 @@ function formFromPatient(patient: Patient) {
   return {
     fullName: patient.fullName,
     email: patient.email,
-    phone: patient.phone ?? "",
-    birthDate: patient.birthDate ?? "",
+    phone: patient.phone,
+    birthDate: patient.birthDate,
     postcode: patient.address.postcode,
     houseNumber: patient.address.houseNumber,
     complement: patient.address.complement ?? "",
@@ -103,8 +103,8 @@ export function EditPatientDialog({ patient }: { patient: Patient }) {
           const errors: Record<string, string> = {};
           if (!isValidName(form.fullName)) errors.fullName = t("validation.invalid_name");
           if (!isValidEmailShape(form.email)) errors.email = t("validation.invalid_email");
-          if (!isValidOptionalPhone(form.phone)) errors.phone = t("validation.invalid_phone");
-          if (!isValidOptionalBirthDate(form.birthDate)) errors.birthDate = t("validation.invalid_birth_date");
+          if (!isValidRequiredPhone(form.phone)) errors.phone = t("validation.invalid_phone");
+          if (!isValidBirthDate(form.birthDate)) errors.birthDate = t("validation.invalid_birth_date");
           if (!isCompletePostcode(form.postcode)) errors.postcode = t("validation.invalid_postcode");
           if (!form.houseNumber.trim()) errors.houseNumber = t("validation.invalid_house_number");
           // guardianCpf is exempt when a masked one is already on file — an
@@ -113,7 +113,8 @@ export function EditPatientDialog({ patient }: { patient: Patient }) {
             isMinor(form.birthDate) &&
             (!form.guardianName.trim() ||
               !form.guardianRelationship ||
-              (!form.guardianCpf.trim() && !patient.maskedGuardianCpf))
+              (!form.guardianCpf.trim() && !patient.maskedGuardianCpf) ||
+              !isValidRequiredPhone(form.guardianPhone))
           ) {
             errors.guardianName = t("patients.guardian_section_hint");
           }
@@ -155,16 +156,17 @@ export function EditPatientDialog({ patient }: { patient: Patient }) {
           required
         />
         <Input
-          label={`${t("patients.phone")} (${t("patients.phone_optional")})`}
+          label={t("patients.phone")}
           name="phone"
           inputMode="numeric"
           value={form.phone}
           maxLength={15}
           error={fieldErrors.phone}
           onChange={(e) => set("phone", maskPhone(e.target.value))}
+          required
         />
         <Input
-          label={`${t("patients.birth_date")} (${t("patients.birth_date_optional")})`}
+          label={t("patients.birth_date")}
           name="birthDate"
           type="date"
           value={form.birthDate}
@@ -172,6 +174,7 @@ export function EditPatientDialog({ patient }: { patient: Patient }) {
           max={todayIsoDate()}
           error={fieldErrors.birthDate}
           onChange={(e) => set("birthDate", e.target.value)}
+          required
         />
         <Input
           label={t("patients.postcode")}
@@ -314,12 +317,13 @@ export function EditPatientDialog({ patient }: { patient: Patient }) {
               ]}
             />
             <Input
-              label={`${t("patients.guardian_phone")} (${t("common.optional")})`}
+              label={t("patients.guardian_phone")}
               name="guardianPhone"
               inputMode="numeric"
               value={form.guardianPhone}
               maxLength={15}
               onChange={(e) => set("guardianPhone", maskPhone(e.target.value))}
+              required
             />
           </>
         )}

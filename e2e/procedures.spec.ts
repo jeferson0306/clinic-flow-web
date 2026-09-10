@@ -38,8 +38,9 @@ test("creates, edits, sorts/searches, and deletes a procedure", async ({ page })
   await page.getByRole("button", { name: /^save$|^salvar$|^guardar$/i }).click();
   await expect(page.getByText(newName)).toBeVisible();
 
-  // Delete: accept the native confirm and verify the row is gone.
-  page.once("dialog", (dialog) => dialog.accept());
+  // Delete: confirm in the dialog (DeleteButton, not window.confirm) and
+  // verify the row is gone.
   await page.getByRole("row", { name: exact(newName) }).getByTitle(/delete|excluir|eliminar/i).click();
+  await page.getByRole("dialog").getByRole("button", { name: /^delete$|^excluir$|^eliminar$/i }).click();
   await expect(page.getByText(newName)).not.toBeVisible();
 });

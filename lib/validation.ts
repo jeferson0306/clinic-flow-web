@@ -77,10 +77,16 @@ export function maskPhone(value: string): string {
   return digits.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{5})(\d{1,4})$/, "$1-$2");
 }
 
-/** Phone is optional everywhere it appears — empty is valid, anything else must be a full 10 or 11-digit number. */
+/** Optional (doctors, a guardian who isn't required yet): empty is valid, anything else must be a full 10 or 11-digit number. */
 export function isValidOptionalPhone(value: string): boolean {
   const digits = onlyDigits(value).length;
   return digits === 0 || digits === 10 || digits === 11;
+}
+
+/** Required (a patient's own phone, and a minor's guardian phone) — mirrors the backend's now-mandatory phone field. */
+export function isValidRequiredPhone(value: string): boolean {
+  const digits = onlyDigits(value).length;
+  return digits === 10 || digits === 11;
 }
 
 // Local part <= 64, domain labels alphanumeric/hyphen, at least one dot — the
@@ -105,9 +111,9 @@ export function earliestBirthDateIso(): string {
   return d.toISOString().slice(0, 10);
 }
 
-/** Empty is valid — birthDate is optional — anything else must be a real past date within a plausible lifespan. */
-export function isValidOptionalBirthDate(value: string): boolean {
-  if (!value) return true;
+/** Required (mirrors the backend's now-mandatory birthDate) — a real past date within a plausible lifespan. */
+export function isValidBirthDate(value: string): boolean {
+  if (!value) return false;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
   return value < todayIsoDate() && value >= earliestBirthDateIso();
 }

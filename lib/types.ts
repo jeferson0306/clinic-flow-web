@@ -26,8 +26,8 @@ export type Patient = {
   fullName: string;
   maskedCpf: string;
   email: string;
-  phone: string | null;
-  birthDate: string | null;
+  phone: string;
+  birthDate: string;
   address: Address;
   createdAt: string;
   socialName: string | null;

@@ -87,7 +87,6 @@
     "create_success": "Paciente registado com sucesso.",
     "duplicate_cpf": "Já existe um paciente com este CPF.",
     "phone_optional": "Opcional",
-    "birth_date_optional": "Opcional",
     "edit": "Editar paciente",
     "clinical_section_title": "Dados clínicos",
     "guardian_section_title": "Responsável legal",

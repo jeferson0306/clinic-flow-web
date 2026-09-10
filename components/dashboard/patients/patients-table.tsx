@@ -48,7 +48,7 @@ export function PatientsTable({
     },
     { id: "maskedCpf", header: t("patients.masked_cpf"), accessorFn: (p) => p.maskedCpf, enableSorting: false },
     { id: "email", header: t("patients.email"), accessorFn: (p) => p.email },
-    { id: "phone", header: t("patients.phone"), accessorFn: (p) => p.phone ?? "—" },
+    { id: "phone", header: t("patients.phone"), accessorFn: (p) => p.phone },
     {
       id: "address",
       header: t("patients.address"),

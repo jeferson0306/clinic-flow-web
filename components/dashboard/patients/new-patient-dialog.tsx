@@ -19,8 +19,8 @@ import {
   isCompletePostcode,
   isValidEmailShape,
   isValidName,
-  isValidOptionalBirthDate,
-  isValidOptionalPhone,
+  isValidBirthDate,
+  isValidRequiredPhone,
   isMinor,
   maskCpf,
   maskPhone,
@@ -103,11 +103,17 @@ export function NewPatientDialog() {
           if (!isValidName(form.fullName)) errors.fullName = t("validation.invalid_name");
           if (!isValidCpf(form.cpf)) errors.cpf = t("validation.invalid_cpf");
           if (!isValidEmailShape(form.email)) errors.email = t("validation.invalid_email");
-          if (!isValidOptionalPhone(form.phone)) errors.phone = t("validation.invalid_phone");
-          if (!isValidOptionalBirthDate(form.birthDate)) errors.birthDate = t("validation.invalid_birth_date");
+          if (!isValidRequiredPhone(form.phone)) errors.phone = t("validation.invalid_phone");
+          if (!isValidBirthDate(form.birthDate)) errors.birthDate = t("validation.invalid_birth_date");
           if (!isCompletePostcode(form.postcode)) errors.postcode = t("validation.invalid_postcode");
           if (!form.houseNumber.trim()) errors.houseNumber = t("validation.invalid_house_number");
-          if (isMinor(form.birthDate) && (!form.guardianName.trim() || !form.guardianCpf.trim() || !form.guardianRelationship)) {
+          if (
+            isMinor(form.birthDate) &&
+            (!form.guardianName.trim() ||
+              !form.guardianCpf.trim() ||
+              !form.guardianRelationship ||
+              !isValidRequiredPhone(form.guardianPhone))
+          ) {
             errors.guardianName = t("patients.guardian_section_hint");
           }
           if (Object.keys(errors).length > 0) {
@@ -159,16 +165,17 @@ export function NewPatientDialog() {
           required
         />
         <Input
-          label={`${t("patients.phone")} (${t("patients.phone_optional")})`}
+          label={t("patients.phone")}
           name="phone"
           inputMode="numeric"
           value={form.phone}
           maxLength={15}
           error={fieldErrors.phone}
           onChange={(e) => set("phone", maskPhone(e.target.value))}
+          required
         />
         <Input
-          label={`${t("patients.birth_date")} (${t("patients.birth_date_optional")})`}
+          label={t("patients.birth_date")}
           name="birthDate"
           type="date"
           value={form.birthDate}
@@ -176,6 +183,7 @@ export function NewPatientDialog() {
           max={todayIsoDate()}
           error={fieldErrors.birthDate}
           onChange={(e) => set("birthDate", e.target.value)}
+          required
         />
         <Input
           label={t("patients.postcode")}
@@ -314,12 +322,13 @@ export function NewPatientDialog() {
               ]}
             />
             <Input
-              label={`${t("patients.guardian_phone")} (${t("common.optional")})`}
+              label={t("patients.guardian_phone")}
               name="guardianPhone"
               inputMode="numeric"
               value={form.guardianPhone}
               maxLength={15}
               onChange={(e) => set("guardianPhone", maskPhone(e.target.value))}
+              required
             />
           </>
         )}
