@@ -26,7 +26,7 @@ test.describe("authentication", () => {
   test("logs in with the seeded admin account and reaches the dashboard", async ({ page }) => {
     await page.goto("/login");
     await page.getByLabel(/email|correo/i).fill("admin@clinicflow.dev");
-    await page.getByLabel(/senha|password|contraseña/i).fill("admin123");
+    await page.getByLabel(/senha|password|contraseña/i).fill("Admin@Flow2026!");
     await page.getByRole("button", { name: /entrar|sign in|iniciar sesión/i }).click();
     await expect(page).toHaveURL(/\/dashboard/);
     await expect(page.getByText(/admin@clinicflow\.dev/i).first()).toBeVisible();
@@ -35,7 +35,7 @@ test.describe("authentication", () => {
   test("logging out returns to /login and blocks the dashboard again", async ({ page }) => {
     await page.goto("/login");
     await page.getByLabel(/email|correo/i).fill("admin@clinicflow.dev");
-    await page.getByLabel(/senha|password|contraseña/i).fill("admin123");
+    await page.getByLabel(/senha|password|contraseña/i).fill("Admin@Flow2026!");
     await page.getByRole("button", { name: /entrar|sign in|iniciar sesión/i }).click();
     await expect(page).toHaveURL(/\/dashboard/);
 
