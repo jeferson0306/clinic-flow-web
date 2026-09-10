@@ -152,12 +152,16 @@ function Navbar({ onRequestDemo }: { onRequestDemo: () => void }) {
   return (
     <header
       id="main-nav"
-      // [transform:translateZ(0)] forces this onto its own compositor layer —
-      // a sticky element combined with backdrop-blur and scroll-triggered
-      // animations elsewhere on the page is a known cross-browser combo for
-      // the sticky element intermittently losing its pinned position on an
-      // anchor jump. This is the standard, harmless hardening for it.
-      className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--bg-body)]/80 backdrop-blur-md [transform:translateZ(0)] will-change-transform"
+      // No `transform` here, on purpose — an earlier attempt added
+      // `translateZ(0)` to this element believing it would "harden" the
+      // sticky positioning, but a `transform` on a `position: sticky`
+      // element (any value, including an identity transform like
+      // translateZ(0)) is itself a well-documented WebKit/Safari bug: it
+      // makes the browser treat the element as non-sticky entirely, not
+      // intermittently. Reported live: the header was missing on every
+      // scroll, not just after a nav-link jump. Removed rather than
+      // "hardened" again.
+      className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--bg-body)]/80 backdrop-blur-md"
     >
       <div className="max-w-6xl mx-auto px-4 md:px-6 h-14 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
@@ -614,7 +618,19 @@ export function LandingPage() {
   }, []);
 
   return (
-    <div ref={rootRef} className="flex flex-col min-h-full">
+    // shrink-0: the real cause of the sticky header releasing partway down
+    // the page (confirmed live: reproducible at any scroll depth, not just
+    // after a nav-link jump). `body` is `height: 100%` (globals.css) *and*
+    // a column flexbox (layout.tsx) — its one flex child defaults to
+    // flex-shrink: 1, so the flex algorithm compresses this div down to
+    // exactly the viewport's height regardless of its actual content
+    // height, and that compressed box (not the visually overflowing
+    // content) is what `position: sticky` uses as its containing block.
+    // The header can only stay stuck while scrolled within that shrunk
+    // box, then releases and scrolls away with everything else.
+    // `shrink-0` stops the compression, letting this div size to its real
+    // content height so sticky has the full page to work with.
+    <div ref={rootRef} className="flex flex-col min-h-full shrink-0">
       <Navbar onRequestDemo={() => setRequestOpen(true)} />
       <main className="flex-1">
         <Hero onRequestDemo={() => setRequestOpen(true)} />
