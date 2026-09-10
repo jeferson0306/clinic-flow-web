@@ -10,13 +10,14 @@ import { Input } from "@/components/ui/input";
 import { SelectField } from "@/components/ui/select-field";
 import { TextAreaField } from "@/components/ui/textarea-field";
 import { Dialog } from "@/components/ui/dialog";
-import { CepPreview } from "@/components/dashboard/patients/cep-preview";
+import { useCepLookup } from "@/lib/hooks/use-cep-lookup";
 import { useTranslation } from "@/lib/i18n";
 import type { Patient } from "@/lib/types";
 import {
   earliestBirthDateIso,
   firstFieldErrorMessage,
   isCompletePostcode,
+  isValidCpf,
   isValidEmailShape,
   isValidName,
   isValidBirthDate,
@@ -44,10 +45,23 @@ function formFromPatient(patient: Patient) {
     fullName: patient.fullName,
     email: patient.email,
     phone: patient.phone,
-    birthDate: patient.birthDate,
+    // Absent entirely for a RECEPCAO session (PatientSummaryResponse has no
+    // birthDate) as well as genuinely unset — either way, "" prompts for a
+    // fresh value rather than crashing isMinor/isValidBirthDate on undefined.
+    birthDate: patient.birthDate ?? "",
     postcode: patient.address.postcode,
     houseNumber: patient.address.houseNumber,
     complement: patient.address.complement ?? "",
+    street: patient.address.street,
+    district: patient.address.district ?? "",
+    city: patient.address.city,
+    state: patient.address.state,
+    // Never prefilled — the backend only ever returns it masked, so there is
+    // no valid CPF value to round-trip here. Blank means "keep the one on
+    // file" (see UpdatePatientRequest's javadoc); a typed value is a real
+    // correction and needs cpfChangeReason alongside it.
+    cpf: "",
+    cpfChangeReason: "",
     socialName: patient.socialName ?? "",
     motherName: patient.motherName ?? "",
     sex: patient.sex ?? "",
@@ -74,6 +88,24 @@ export function EditPatientDialog({ patient }: { patient: Patient }) {
 
   function set<K extends keyof ReturnType<typeof formFromPatient>>(key: K, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  // Autofilling during render off a "last postcode we already filled for"
+  // ref — not a useEffect — is the React-endorsed way to derive state from
+  // a query change without an extra render pass; see the identical comment
+  // in NewPatientDialog and react-hooks/set-state-in-effect.
+  const cepLookup = useCepLookup(form.postcode);
+  const [autofilledFor, setAutofilledFor] = useState<string | null>(null);
+  if (cepLookup.data?.found && form.postcode !== autofilledFor) {
+    const resolved = cepLookup.data;
+    setAutofilledFor(form.postcode);
+    setForm((prev) => ({
+      ...prev,
+      street: resolved.street ?? prev.street,
+      district: resolved.district ?? prev.district,
+      city: resolved.city ?? prev.city,
+      state: resolved.state ?? prev.state,
+    }));
   }
 
   return (
@@ -107,6 +139,15 @@ export function EditPatientDialog({ patient }: { patient: Patient }) {
           if (!isValidBirthDate(form.birthDate)) errors.birthDate = t("validation.invalid_birth_date");
           if (!isCompletePostcode(form.postcode)) errors.postcode = t("validation.invalid_postcode");
           if (!form.houseNumber.trim()) errors.houseNumber = t("validation.invalid_house_number");
+          if (!form.street.trim()) errors.street = t("validation.invalid_street");
+          if (!form.city.trim()) errors.city = t("validation.invalid_city");
+          if (!form.state.trim()) errors.state = t("validation.invalid_state");
+          // A blank cpf means "keep the one on file" — only a typed value is
+          // validated, and only then does it need a reason (correction 3).
+          if (form.cpf.trim()) {
+            if (!isValidCpf(form.cpf)) errors.cpf = t("validation.invalid_cpf");
+            if (!form.cpfChangeReason.trim()) errors.cpfChangeReason = t("validation.cpf_change_reason_required");
+          }
           // guardianCpf is exempt when a masked one is already on file — an
           // untouched (blank) field there means "keep it," not "missing."
           if (
@@ -156,6 +197,27 @@ export function EditPatientDialog({ patient }: { patient: Patient }) {
           required
         />
         <Input
+          label={`${t("patients.cpf")} (${patient.maskedCpf})`}
+          name="cpf"
+          placeholder="000.000.000-00"
+          inputMode="numeric"
+          value={form.cpf}
+          maxLength={14}
+          error={fieldErrors.cpf}
+          onChange={(e) => set("cpf", maskCpf(e.target.value))}
+        />
+        {form.cpf.trim() && (
+          <Input
+            label={t("patients.cpf_change_reason")}
+            name="cpfChangeReason"
+            value={form.cpfChangeReason}
+            maxLength={200}
+            error={fieldErrors.cpfChangeReason}
+            onChange={(e) => set("cpfChangeReason", e.target.value)}
+            required
+          />
+        )}
+        <Input
           label={t("patients.phone")}
           name="phone"
           inputMode="numeric"
@@ -187,7 +249,6 @@ export function EditPatientDialog({ patient }: { patient: Patient }) {
           onChange={(e) => set("postcode", maskPostcode(e.target.value))}
           required
         />
-        <CepPreview postcode={form.postcode} />
         <div className="grid grid-cols-2 gap-3">
           <Input
             label={t("patients.house_number")}
@@ -206,6 +267,43 @@ export function EditPatientDialog({ patient }: { patient: Patient }) {
             onChange={(e) => set("complement", e.target.value)}
           />
         </div>
+        <Input
+          label={t("patients.street")}
+          name="street"
+          value={form.street}
+          maxLength={120}
+          error={fieldErrors.street}
+          onChange={(e) => set("street", e.target.value)}
+          required
+        />
+        <div className="grid grid-cols-2 gap-3">
+          <Input
+            label={`${t("patients.district")} (${t("common.optional")})`}
+            name="district"
+            value={form.district}
+            maxLength={80}
+            onChange={(e) => set("district", e.target.value)}
+          />
+          <Input
+            label={t("patients.city")}
+            name="city"
+            value={form.city}
+            maxLength={80}
+            error={fieldErrors.city}
+            onChange={(e) => set("city", e.target.value)}
+            required
+          />
+        </div>
+        <Input
+          label={t("patients.state")}
+          name="state"
+          placeholder="SP"
+          value={form.state}
+          maxLength={2}
+          error={fieldErrors.state}
+          onChange={(e) => set("state", e.target.value.toUpperCase())}
+          required
+        />
 
         <p className="text-[10px] font-semibold uppercase tracking-widest text-[var(--text-muted)] mt-1">
           {t("patients.clinical_section_title")}

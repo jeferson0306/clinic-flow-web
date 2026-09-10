@@ -154,6 +154,10 @@ export const api = {
         postcode: string;
         houseNumber: string;
         complement?: string;
+        street: string;
+        district?: string;
+        city: string;
+        state: string;
       } & PatientClinicalFields,
     ) => request<Patient>("/v1/patients", { method: "POST", body: data }),
     update: (
@@ -166,6 +170,15 @@ export const api = {
         postcode: string;
         houseNumber: string;
         complement?: string;
+        street: string;
+        district?: string;
+        city: string;
+        state: string;
+        // Blank keeps the CPF on file — see UpdatePatientRequest's javadoc.
+        // A real change requires cpfChangeReason; the backend rejects one
+        // without the other.
+        cpf?: string;
+        cpfChangeReason?: string;
       } & PatientClinicalFields,
     ) => request<Patient>(`/v1/patients/${id}`, { method: "PUT", body: data }),
     delete: (id: string) => request<void>(`/v1/patients/${id}`, { method: "DELETE" }),

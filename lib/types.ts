@@ -6,10 +6,10 @@ export type ErrorCategory = "VALIDATION" | "CONFLICT" | "NOT_FOUND" | "RATE_LIMI
 
 export type Address = {
   postcode: string;
-  street: string | null;
+  street: string;
   district: string | null;
-  city: string | null;
-  state: string | null;
+  city: string;
+  state: string;
   ibgeCode: string | null;
   houseNumber: string;
   complement: string | null;
@@ -21,27 +21,36 @@ export type BloodType = "A_POS" | "A_NEG" | "B_POS" | "B_NEG" | "AB_POS" | "AB_N
 
 export type GuardianRelationship = "MAE" | "PAI" | "TUTOR" | "OUTRO";
 
+/**
+ * Mirrors PatientResponse — but a RECEPCAO session gets PatientSummaryResponse
+ * from the same endpoints instead, which simply omits every field below
+ * `createdAt`: not null, entirely absent from the JSON. Modeled as optional
+ * here rather than as two separate types so most of the app (tables, the
+ * registration half of both dialogs) doesn't have to type-narrow a union it
+ * never reads clinical data from; only the edit dialog's clinical/guardian
+ * fields need to tolerate `undefined` on top of the `null` they already did.
+ */
 export type Patient = {
   id: string;
   fullName: string;
   maskedCpf: string;
   email: string;
   phone: string;
-  birthDate: string;
   address: Address;
   createdAt: string;
-  socialName: string | null;
-  motherName: string | null;
-  sex: Sex | null;
-  bloodType: BloodType | null;
-  allergies: string | null;
-  continuousMedications: string | null;
-  preExistingConditions: string | null;
-  clinicalAlert: string | null;
-  guardianName: string | null;
-  maskedGuardianCpf: string | null;
-  guardianRelationship: GuardianRelationship | null;
-  guardianPhone: string | null;
+  birthDate?: string;
+  socialName?: string | null;
+  motherName?: string | null;
+  sex?: Sex | null;
+  bloodType?: BloodType | null;
+  allergies?: string | null;
+  continuousMedications?: string | null;
+  preExistingConditions?: string | null;
+  clinicalAlert?: string | null;
+  guardianName?: string | null;
+  maskedGuardianCpf?: string | null;
+  guardianRelationship?: GuardianRelationship | null;
+  guardianPhone?: string | null;
 };
 
 export type Doctor = {

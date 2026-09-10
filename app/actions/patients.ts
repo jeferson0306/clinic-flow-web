@@ -37,8 +37,12 @@ export async function createPatient(_prev: FormState, formData: FormData): Promi
   const postcode = String(formData.get("postcode") ?? "").trim();
   const houseNumber = String(formData.get("houseNumber") ?? "").trim();
   const complement = String(formData.get("complement") ?? "").trim();
+  const street = String(formData.get("street") ?? "").trim();
+  const district = String(formData.get("district") ?? "").trim();
+  const city = String(formData.get("city") ?? "").trim();
+  const state = String(formData.get("state") ?? "").trim();
 
-  if (!fullName || !cpf || !email || !phone || !birthDate || !postcode || !houseNumber) {
+  if (!fullName || !cpf || !email || !phone || !birthDate || !postcode || !houseNumber || !street || !city || !state) {
     return { error: "missing_fields" };
   }
 
@@ -52,6 +56,10 @@ export async function createPatient(_prev: FormState, formData: FormData): Promi
       postcode,
       houseNumber,
       complement: complement || undefined,
+      street,
+      district: district || undefined,
+      city,
+      state,
       ...clinicalFieldsFrom(formData),
     });
   } catch (error) {
@@ -77,8 +85,16 @@ export async function updatePatient(_prev: FormState, formData: FormData): Promi
   const postcode = String(formData.get("postcode") ?? "").trim();
   const houseNumber = String(formData.get("houseNumber") ?? "").trim();
   const complement = String(formData.get("complement") ?? "").trim();
+  const street = String(formData.get("street") ?? "").trim();
+  const district = String(formData.get("district") ?? "").trim();
+  const city = String(formData.get("city") ?? "").trim();
+  const state = String(formData.get("state") ?? "").trim();
+  // Blank means "keep the CPF on file" — see UpdatePatientRequest's javadoc
+  // on the backend for why this mirrors guardianCpf's own pattern.
+  const cpf = String(formData.get("cpf") ?? "").trim();
+  const cpfChangeReason = String(formData.get("cpfChangeReason") ?? "").trim();
 
-  if (!id || !fullName || !email || !phone || !birthDate || !postcode || !houseNumber) {
+  if (!id || !fullName || !email || !phone || !birthDate || !postcode || !houseNumber || !street || !city || !state) {
     return { error: "missing_fields" };
   }
 
@@ -91,6 +107,12 @@ export async function updatePatient(_prev: FormState, formData: FormData): Promi
       postcode,
       houseNumber,
       complement: complement || undefined,
+      street,
+      district: district || undefined,
+      city,
+      state,
+      cpf: cpf || undefined,
+      cpfChangeReason: cpfChangeReason || undefined,
       ...clinicalFieldsFrom(formData),
     });
   } catch (error) {

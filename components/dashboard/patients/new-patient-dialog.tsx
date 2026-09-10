@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { SelectField } from "@/components/ui/select-field";
 import { TextAreaField } from "@/components/ui/textarea-field";
 import { Dialog } from "@/components/ui/dialog";
-import { CepPreview } from "@/components/dashboard/patients/cep-preview";
+import { useCepLookup } from "@/lib/hooks/use-cep-lookup";
 import { useTranslation } from "@/lib/i18n";
 import {
   earliestBirthDateIso,
@@ -40,6 +40,10 @@ const EMPTY_FORM = {
   postcode: "",
   houseNumber: "",
   complement: "",
+  street: "",
+  district: "",
+  city: "",
+  state: "",
   socialName: "",
   motherName: "",
   sex: "",
@@ -80,6 +84,27 @@ export function NewPatientDialog() {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
+  // ViaCEP pre-fills street/district/city/state as a courtesy — every field
+  // stays a real, editable input either way, so a wrong or missing lookup
+  // never blocks the form (correction 2: no more address fields that only
+  // ever came from a third-party API). Autofilling during render off a
+  // "last postcode we already filled for" ref — not a useEffect — is the
+  // React-endorsed way to derive state from a prop/query change without an
+  // extra render pass; see react-hooks/set-state-in-effect.
+  const cepLookup = useCepLookup(form.postcode);
+  const [autofilledFor, setAutofilledFor] = useState<string | null>(null);
+  if (cepLookup.data?.found && form.postcode !== autofilledFor) {
+    const resolved = cepLookup.data;
+    setAutofilledFor(form.postcode);
+    setForm((prev) => ({
+      ...prev,
+      street: resolved.street ?? prev.street,
+      district: resolved.district ?? prev.district,
+      city: resolved.city ?? prev.city,
+      state: resolved.state ?? prev.state,
+    }));
+  }
+
   return (
     <Dialog
       open={open}
@@ -107,6 +132,9 @@ export function NewPatientDialog() {
           if (!isValidBirthDate(form.birthDate)) errors.birthDate = t("validation.invalid_birth_date");
           if (!isCompletePostcode(form.postcode)) errors.postcode = t("validation.invalid_postcode");
           if (!form.houseNumber.trim()) errors.houseNumber = t("validation.invalid_house_number");
+          if (!form.street.trim()) errors.street = t("validation.invalid_street");
+          if (!form.city.trim()) errors.city = t("validation.invalid_city");
+          if (!form.state.trim()) errors.state = t("validation.invalid_state");
           if (
             isMinor(form.birthDate) &&
             (!form.guardianName.trim() ||
@@ -196,7 +224,6 @@ export function NewPatientDialog() {
           onChange={(e) => set("postcode", maskPostcode(e.target.value))}
           required
         />
-        <CepPreview postcode={form.postcode} />
         <div className="grid grid-cols-2 gap-3">
           <Input
             label={t("patients.house_number")}
@@ -215,6 +242,43 @@ export function NewPatientDialog() {
             onChange={(e) => set("complement", e.target.value)}
           />
         </div>
+        <Input
+          label={t("patients.street")}
+          name="street"
+          value={form.street}
+          maxLength={120}
+          error={fieldErrors.street}
+          onChange={(e) => set("street", e.target.value)}
+          required
+        />
+        <div className="grid grid-cols-2 gap-3">
+          <Input
+            label={`${t("patients.district")} (${t("common.optional")})`}
+            name="district"
+            value={form.district}
+            maxLength={80}
+            onChange={(e) => set("district", e.target.value)}
+          />
+          <Input
+            label={t("patients.city")}
+            name="city"
+            value={form.city}
+            maxLength={80}
+            error={fieldErrors.city}
+            onChange={(e) => set("city", e.target.value)}
+            required
+          />
+        </div>
+        <Input
+          label={t("patients.state")}
+          name="state"
+          placeholder="SP"
+          value={form.state}
+          maxLength={2}
+          error={fieldErrors.state}
+          onChange={(e) => set("state", e.target.value.toUpperCase())}
+          required
+        />
 
         <p className="text-[10px] font-semibold uppercase tracking-widest text-[var(--text-muted)] mt-1">
           {t("patients.clinical_section_title")}
