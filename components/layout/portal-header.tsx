@@ -24,6 +24,7 @@ export function PortalHeader({ email }: { email: string }) {
   const links = [
     { href: "/portal", label: t("portal.nav_home") },
     { href: "/portal/appointments", label: t("portal.nav_appointments") },
+    { href: "/portal/profile", label: t("portal.nav_profile") },
   ];
 
   return (
